@@ -1,0 +1,71 @@
+# Resume Analyzer & Job Recommender - Requirements
+# Python 3.10+
+
+# ====================
+# CORE NLP & ML
+# ====================
+langchain
+langchain-community
+sentence-transformers
+ollama
+
+# ====================
+# PDF & TEXT PROCESSING
+# ====================
+pdfplumber
+pypdf
+spacy
+keybert
+
+# ====================
+# VECTOR DATABASE & SIMILARITY
+# ====================
+faiss-cpu
+scikit-learn
+
+# ====================
+# DATA & COMPUTATION
+# ====================
+pandas
+numpy
+
+# ====================
+# WEB UI (Optional)
+# ====================
+streamlit
+
+# ====================
+# UTILITIES
+# ====================
+python-dotenv
+pydantic
+pydantic-settings
+python-dateutil
+requests
+
+# ====================
+# LOGGING & DEBUGGING
+# ====================
+loguru
+
+# ====================
+# TESTING
+# ====================
+pytest
+pytest-cov
+pytest-asyncio
+
+# ====================
+# DEVELOPMENT
+# ====================
+black
+flake8
+isort
+mypy
+
+# ====================
+# JUPYTER (Optional for notebooks)
+# ====================
+jupyter
+notebook
+ipykernel

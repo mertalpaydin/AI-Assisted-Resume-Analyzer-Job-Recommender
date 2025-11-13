@@ -99,15 +99,8 @@ This project combines state-of-the-art NLP techniques with local LLMs and semant
 
 - **Python 3.10+**
 - **Ollama** (installed and running with models downloaded)
-- **FAISS** (CPU or GPU version)
-- 4-8 GB RAM minimum (depending on model selection)
-- **RAM**: 4-8 GB minimum
-- **GPU** (optional but recommended): NVIDIA GPU with 4GB+ VRAM
-  
-**GPU Requirements:**
-- CUDA Toolkit 11.8+
-- cuDNN 8.0+
-- Updated NVIDIA drivers
+- **FAISS-CPU**
+- **RAM**: 4-8 GB minimum (depending on model selection)
 
 ### Installation
 
@@ -125,35 +118,23 @@ cd resume-analyzer
 
 3. **Create virtual environment with UV**
 ```bash
-uv venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+uv venv
+source venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-4. **Install FAISS (choose one)**
-
-**For GPU (Recommended):**
-```bash
-uv pip install faiss-gpu
-```
-
-**For CPU (Fallback):**
-```bash
-uv pip install faiss-cpu
-```
-
-5. **Install all dependencies**
+4. **Install all dependencies**
 ```bash
 uv pip install -r requirements.txt
 ```
 
-6. **Download spaCy model**
+5. **Download spaCy model**
 ```bash
-python -m spacy download en_core_web_sm
+uv run python -m spacy download en_core_web_sm
 ```
 
-7. **Verify setup**
+6. **Verify setup**
 ```bash
-python verify_setup.py
+uv run python verify_setup.py
 ```
 
 ### Running the Pipeline
