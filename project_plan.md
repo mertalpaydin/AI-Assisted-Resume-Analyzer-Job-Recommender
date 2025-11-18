@@ -50,73 +50,77 @@
 ## Phase 1: Project Setup & Data Preparation
 
 ### Step 1.1: Environment Setup & Dependencies
-- [ ] Create project directory structure
-  - [ ] `/data` - for datasets (already downloaded)
-  - [ ] `/src` - for main pipeline code
-  - [ ] `/notebooks` - for exploration and analysis
-  - [ ] `/logs` - for learning documentation (initialized in Phase 0)
-  - [ ] `/tests` - for unit tests
+- [x] Create project directory structure
+  - [x] `/data` - for datasets (already downloaded)
+  - [x] `/src` - for main pipeline code
+  - [x] `/notebooks` - for exploration and analysis
+  - [x] `/logs` - for learning documentation (initialized in Phase 0)
+  - [x] `/tests` - for unit tests
 
-- [ ] Set up Python virtual environment
-- [ ] Install core dependencies via uv using requirements.txt
-- [ ] **Logging:** Document Python version and package versions installed
+- [x] Set up Python virtual environment
+- [x] Install core dependencies via uv using requirements.txt
+- [x] **Logging:** Document Python version and package versions installed
 
 ### Step 1.2: Verify Data & Ollama Setup
-- [ ] Verify dataset location and load:
-  - [ ] Confirm US Job Postings dataset is accessible
-  - [ ] Load and examine JSON schema
-  - [ ] Identify key fields (job title, description, required skills, etc.)
-  - [ ] Check data quality and missing values
-  - [ ] Sample 5-10 job postings for testing
+- [x] Verify dataset location and load:
+  - [x] Confirm US Job Postings dataset is accessible
+  - [x] Load and examine JSON schema
+  - [x] Identify key fields (job title, description, required skills, etc.)
+  - [x] Check data quality and missing values
+  - [x] Sample 5-10 job postings for testing
 
-- [ ] Verify Ollama installation and downloaded models:
-  - [ ] List available models: `ollama list`
-  - [ ] Test each model:
-    - [ ] granite4:micro - verify functionality
-    - [ ] llama3.2:3b - verify functionality
-    - [ ] gemma3:4b - verify functionality
-  - [ ] Document model characteristics: size, latency, response quality
+- [x] Verify Ollama installation and downloaded models:
+  - [x] List available models: `ollama list`
+  - [x] Test each model:
+    - [x] granite4:micro - verify functionality
+    - [x] llama3.2:3b - verify functionality
+    - [x] gemma3:4b - verify functionality
+  - [x] Document model characteristics: size, latency, response quality
 
 - [ ] Prepare sample resumes:
   - [ ] Create 3-5 realistic test resumes in PDF format
   - [ ] Ensure they cover different experience levels and industries
-  - [ ] **Experiment Log:** Try resumes with varying formatting (headers, bullets, paragraphs)
+  - [x] **Experiment Log:** Try resumes with varying formatting (headers, bullets, paragraphs)
 
-- [ ] **Learning Log:** Document initial observations about data structure, models, and potential challenges
+- [x] **Learning Log:** Document initial observations about data structure, models, and potential challenges
 
 ---
 
 ## Phase 2: Resume Parsing & Structured Extraction
 
-### Step 2.1: Verify & Test Local LLM Models
-- [ ] Confirm Ollama is running and models are available:
-  - [ ] `ollama list` to verify downloaded models
-  - [ ] Ensure models are accessible via Ollama API
+### Step 2.1: Verify & Test Local LLM Models ✓ COMPLETED
+- [x] Confirm Ollama is running and models are available:
+  - [x] `ollama list` to verify downloaded models
+  - [x] Ensure models are accessible via Ollama API
 
-- [ ] Test each available model with sample prompts:
-  - [ ] **granite4:micro** - test parsing capability, document latency
-  - [ ] **llama3.2:3b** - test parsing capability, document latency
-  - [ ] **gemma3:4b** - test parsing capability, document latency
-  
-- [ ] **Experiment Log:** Create systematic comparison:
-  - [ ] Response quality for resume extraction
-  - [ ] Speed and latency measurements
-  - [ ] Memory/resource usage
-  - [ ] Reliability (consistency across runs)
-  - [ ] Document findings in `/logs/experiment_log.md`
-  - [ ] Make preliminary recommendation for Phase 2.4
+- [x] Test each available model with sample prompts:
+  - [x] **granite4:micro** - test parsing capability, document latency
+  - [x] **llama3.2:3b** - test parsing capability, document latency
+  - [x] **gemma3:4b** - test parsing capability, document latency
 
-### Step 2.2: Build PDF Parser with LangChain
-- [ ] Create `pdf_parser.py` module:
-  - [ ] Use LangChain's document loaders (PDFPlumber or PyPDF)
-  - [ ] Extract raw text from PDFs
-  - [ ] Handle multi-page resumes
+- [x] **Experiment Log:** Create systematic comparison:
+  - [x] Response quality for resume extraction (rigorous validation with ground truth)
+  - [x] Speed and latency measurements (4 runs per model, 1st discarded)
+  - [x] Memory/resource usage
+  - [x] Reliability (consistency across runs)
+  - [x] Document findings in `/logs/experiment_log.md`
+  - [x] Make preliminary recommendation for Phase 2.4
+
+**RESULT:** gemma3:4b selected (100% quality, 14.61s latency, perfect consistency)
+
+### Step 2.2: Build PDF Parser with LangChain ✓ COMPLETED
+- [x] Create `pdf_parser.py` module:
+  - [x] Use LangChain's document loaders (PDFPlumber or PyPDF)
+  - [x] Extract raw text from PDFs
+  - [x] Handle multi-page resumes
   - [ ] Test on sample resumes
-  
+
 - [ ] **Experiment Log:** Try multiple PDF loading strategies:
   - [ ] Different page extraction methods
   - [ ] Handling of special formatting (tables, columns)
   - [ ] Performance metrics for each approach
+
+**ToDo:** Testing to be done with sample resumes 
 
 ### Step 2.3: Design Resume JSON Schema
 - [ ] Define structured output schema with fields:

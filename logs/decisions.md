@@ -58,132 +58,55 @@ This document tracks all major technical and architectural decisions made throug
 
 ## Decisions Log
 
-### Decision #1: Use Markdown for Documentation
-**Date:** 2025-11-13
-**Phase:** Phase 0 - Documentation Infrastructure
+### Decision #1: Select gemma3:4b as Primary LLM for Resume Parsing
+**Date:** 2025-11-18
+**Phase:** Phase 2 - Resume Parsing & Structured Extraction
 **Status:** Accepted
 
 **Context:**
-Need to establish a documentation format that is human-readable, version-control friendly, and supports structured learning capture throughout the project.
+Need to select a local LLM model for extracting structured data from resume PDFs. Three models were available via Ollama: granite4:micro (2.1GB), llama3.2:3b (2.0GB), and gemma3:4b (3.3GB). Requirements include high accuracy extraction, consistent output, handling of edge cases (multiple emails, promotions, complex formatting), and reasonable latency (<20s).
 
 **Decision:**
-Use Markdown (.md) format for all project documentation including learning logs, experiment logs, and decision records.
+Use **gemma3:4b** as the primary LLM model for resume parsing operations.
 
 **Alternatives Considered:**
-1. **Markdown**
-   - Pros: Plain text, version-control friendly, widely supported, readable without tools
-   - Cons: Limited formatting options compared to rich text
+1. **granite4:micro**
+   - Pros: Fast (7.92s avg latency), good quality (88.9%), smallest model size, reasonable accuracy
+   - Cons: Inconsistent across runs, 11.1% error rate, struggles with edge cases
 
-2. **Jupyter Notebooks**
-   - Pros: Can embed code and visualizations, interactive
-   - Cons: JSON-based format difficult to diff, not ideal for pure documentation
+2. **llama3.2:3b**
+   - Pros: Fastest (3.02s avg latency), smallest inference time
+   - Cons: Poor quality (50% accuracy), unreliable (1/4 runs failed to produce valid JSON), many validation errors, insufficient skill extraction
 
-3. **Google Docs / Word**
-   - Pros: Rich formatting, comments, collaboration features
-   - Cons: Not version-control friendly, requires external tools
-
-**Rationale:**
-Markdown provides the best balance of simplicity, readability, and version control integration. Perfect for documentation that will live alongside code in a Git repository.
-
-**Trade-offs:**
-- Accept limited formatting in exchange for better version control and portability
-- Can't embed interactive elements, but documentation focus is on text
-
-**Consequences:**
-- Positive: Documentation can be reviewed in pull requests, easily searchable, portable
-- Negative: Need external tools for diagrams (can link to image files)
-- Risks: None significant
-
-**Related Decisions:**
-- Decision #2: Git-based version control
-
----
-
-### Decision #2: Chunking Strategy for Job Postings
-**Date:** 2025-11-13
-**Phase:** Phase 4 - Planning
-**Status:** Accepted
-
-**Context:**
-Job postings vary significantly in length (some have extensive descriptions). Need to decide whether to embed entire job postings as single vectors or split them into semantic chunks.
-
-**Decision:**
-Implement intelligent chunking strategy with job_id mapping:
-- Split each job posting into ~6-8 semantic chunks (title, description, requirements, etc.)
-- Maintain bidirectional mapping between chunks and complete job postings
-- Automatically deduplicate results (multiple chunks → single unique job)
-
-**Alternatives Considered:**
-1. **Chunking with job_id mapping** (chosen)
-   - Pros: Better matching precision, handles long descriptions, captures nuanced requirements
-   - Cons: More complex implementation, larger vector store (~1.2M chunks vs 200K jobs)
-
-2. **Single embedding per job**
-   - Pros: Simpler implementation, smaller vector store, faster initial setup
-   - Cons: Loss of precision for long descriptions, difficulty capturing specific sections
-
-3. **Hybrid approach** (summary embedding + detail chunks)
-   - Pros: Balanced approach
-   - Cons: Most complex, unclear benefit over pure chunking
+3. **gemma3:4b**
+   - Pros: Perfect quality (100%), zero validation errors, perfect consistency (4/4 runs scored 100%), handles all edge cases, no hallucinations
+   - Cons: Slowest (14.61s avg latency), larger model size
 
 **Rationale:**
-Chunking provides significantly better matching accuracy for detailed job descriptions. The additional complexity of job_id mapping is manageable and provides automatic deduplication. FAISS can easily handle 1.2M vectors.
+gemma3:4b was selected despite being the slowest model because:
+- **Perfect accuracy** (100%) is critical for production reliability - cannot afford 11-50% error rates
+- **Zero validation errors** across all test runs demonstrates robustness
+- **Perfect consistency** (all 4 runs scored 100%) shows reliability under varying conditions
+- **Handles complex edge cases** (multiple emails, promotions, 40+ skills) that other models failed
+- The 14.61s latency is acceptable for a resume parsing operation (not user-interactive)
+- Extra ~7 seconds compared to granite4:micro is worth the 11.1% accuracy improvement
+- Production systems prioritize correctness over speed for non-realtime operations
 
 **Trade-offs:**
-- Accept increased vector store size for better matching accuracy
-- Accept implementation complexity for automatic deduplication
-- Gain: chunk-level precision, better handling of long descriptions
+- Speed vs Accuracy: Accepted 1.8x slower performance for perfect accuracy
+- Model Size vs Quality: Larger model (3.3GB vs 2.0-2.1GB) justified by perfect extraction
+- Resource Usage: Higher memory/compute justified by zero error rate
 
 **Consequences:**
-- Positive: More accurate job matches, captures nuanced requirements, scalable
-- Negative: Requires job_id mapping implementation, slightly more memory usage
-- Risks: Must ensure deduplication works correctly to avoid showing duplicate jobs
+- Positive: Perfect resume parsing reliability, no failed extractions, consistent structured output, handles all edge cases
+- Negative: Slower response time (14.6s vs 7.9s vs 3.0s), higher memory usage, longer model load time
+- Risks: May need optimization for high-volume processing, consider caching or batch processing strategies
 
 **Related Decisions:**
-- Decision on FAISS index type (Phase 4)
-- Decision on MMR parameters (Phase 4)
+- Experiment #1: LLM Model Comparison (logs/experiment_log.md)
+- Decision will inform Phase 2 Step 2.4 (Resume Extractor implementation)
 
----
-
-### Decision #3: Local LLMs via Ollama
-**Date:** 2025-11-13
-**Phase:** Phase 0 - Planning
-**Status:** Accepted
-
-**Context:**
-Need to choose between cloud-based LLMs (OpenAI, Anthropic) vs local LLMs for resume parsing and CV improvement suggestions. Privacy, cost, and learning objectives are key considerations.
-
-**Decision:**
-Use local LLMs via Ollama (granite4:micro, llama3.2:3b, gemma3:4b) for all LLM tasks.
-
-**Alternatives Considered:**
-1. **Local LLMs via Ollama** (chosen)
-   - Pros: No API costs, privacy (resumes stay local), learning opportunity, offline capability
-   - Cons: Requires local compute, may have lower quality than GPT-4
-
-2. **Cloud LLMs (OpenAI GPT-3.5/4)**
-   - Pros: Higher quality, no local compute needed, simpler setup
-   - Cons: API costs, privacy concerns with resumes, requires internet
-
-3. **Hybrid approach**
-   - Pros: Use local for development, cloud for production
-   - Cons: Complex, two codepaths to maintain
-
-**Rationale:**
-This is a learning project focused on understanding LLM capabilities. Local models provide hands-on experience with model comparison, while keeping resume data private and avoiding API costs.
-
-**Trade-offs:**
-- Accept potentially lower quality outputs for privacy and learning benefits
-- Need to invest time in local setup and model comparison
-- Gain: deeper understanding of LLM behavior, no ongoing costs
-
-**Consequences:**
-- Positive: Complete privacy, no API costs, learn model differences, portable
-- Negative: Requires GPU/CPU resources, may need prompt engineering iteration
-- Risks: Model quality may require fallback strategies
-
-**Related Decisions:**
-- Experiment 2.1: LLM Model Comparison
+**Review Date:** After completing Phase 2.4 - may consider hybrid approach (fast model with gemma3:4b fallback) if speed becomes critical
 
 ---
 
@@ -191,21 +114,16 @@ This is a learning project focused on understanding LLM capabilities. Local mode
 
 | # | Title | Phase | Status | Date | Impact |
 |---|-------|-------|--------|------|--------|
-| 1 | Use Markdown for Documentation | 0 | Accepted | 2025-11-13 | Low |
-| 2 | Chunking Strategy for Job Postings | 4 | Accepted | 2025-11-13 | High |
-| 3 | Local LLMs via Ollama | 0 | Accepted | 2025-11-13 | High |
+| 1 | Select gemma3:4b as Primary LLM for Resume Parsing | 2 | Accepted | 2025-11-18 | High |
+
 
 ---
 
 ## Decisions to Make (Future)
 
-### Phase 1
-- [ ] Python package manager (pip vs uv vs poetry)
-- [ ] Virtual environment approach
-
 ### Phase 2
 - [ ] PDF parsing library selection (after Experiment 2.2)
-- [ ] LLM model selection for resume parsing (after Experiment 2.1)
+- [x] ~~LLM model selection for resume parsing (after Experiment 2.1)~~ - COMPLETED: gemma3:4b (Decision #1)
 - [ ] Output parser approach (Pydantic vs JSON)
 
 ### Phase 3

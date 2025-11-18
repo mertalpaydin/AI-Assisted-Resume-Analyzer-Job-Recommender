@@ -121,29 +121,41 @@ Use this template for each experiment:
 - Reference code commits for implementation details
 ---
 
-### Experiment #0: Test Experiment
-**Date:** 2025-11-13
-**Phase:** Phase 0 - Testing
-**Objective:** Verify logging utilities work correctly
+### Experiment #1: LLM Model Comparison for Resume Parsing
+**Date:** 2025-11-18
+**Phase:** Phase 2 - Resume Parsing & Structured Extraction
+**Objective:** Compare local LLM models (granite4:micro, llama3.2:3b, gemma3:4b) for structured resume data extraction capability
 
-**Hypothesis:** Logging functions will create proper markdown entries
+**Hypothesis:** Larger models (gemma3:4b, llama3.2:3b) will have better extraction accuracy but slower response times compared to granite4:micro
 
 **Options Tested:**
-1. **Option A**
-   - Configuration: Test config
-   - Results: Success
-   - Observations: Works as expected
+1. **granite4:micro**
+   - Configuration: Default Ollama settings, 4 runs (1st discarded as warm-up), temperature=1.0
+   - Results: Avg Latency: 7.92s (over 3 runs), JSON Valid: True, Quality Score: 88.9%, Validation Errors: 1
+   - Observations: Errors: 1
+
+2. **llama3.2:3b**
+   - Configuration: Default Ollama settings, 4 runs (1st discarded as warm-up), temperature=1.0
+   - Results: Avg Latency: 3.02s (over 2 runs), JSON Valid: True, Quality Score: 50.0%, Validation Errors: 1
+   - Observations: Errors: 1; Warnings: 2
+
+3. **gemma3:4b**
+   - Configuration: Default Ollama settings, 4 runs (1st discarded as warm-up), temperature=1.0
+   - Results: Avg Latency: 14.61s (over 3 runs), JSON Valid: True, Quality Score: 100.0%, Validation Errors: 0
+   - Observations: No issues detected
 
 **Metrics Used:**
-- Success Rate: Whether function executes without error
+- Latency: Time in seconds to complete extraction
+- JSON Validity: Whether output is valid, parseable JSON
+- Quality Score: Percentage of required fields correctly extracted
+- Missing Fields: Count of required fields not extracted
 
-**Winner:** Option A
+**Winner:** gemma3:4b
 
-**Rationale:** Only option tested
+**Rationale:** gemma3:4b was selected for its quality score of 100.0% and latency of 14.61s
 
-**Key Learning:** Logging utilities are functional
+**Key Learning:** Model selection involves trade-offs between speed and accuracy. Prompt engineering is critical for consistent JSON output.
 
-**Impact on Project:** Can now track experiments throughout project
+**Impact on Project:** Will use gemma3:4b as primary model for resume parsing in subsequent phases. May implement fallback logic or retry mechanisms for improved reliability.
 
-
-**Next Steps:** Use in actual experiments
+**Next Steps:** Test winner model with actual PDF resume samples. Implement Pydantic output parsers for better JSON reliability.
