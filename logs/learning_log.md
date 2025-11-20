@@ -172,9 +172,179 @@ Implemented `ResumeExtractor` with dual-parser sequential pipeline:
 
 ## Phase 3: Text Preprocessing & Skill Extraction
 
-**Status:** Not Started
+**Start Date:** 2025-11-20
+**End Date:** 2025-11-20
+**Status:** Completed
 
-*(To be updated as phase progresses)*
+### Step 3.1: Set Up Text Preprocessing Pipeline
+
+**Status:** Completed
+**Timestamp:** 2025-11-20
+
+Created comprehensive `TextPreprocessor` class (`src/text_preprocessor.py`) with:
+
+**Core Features:**
+- **Text Cleaning:** URL/email removal, special character handling, whitespace normalization
+- **Tokenization:** spaCy-based tokenization with configurable options
+- **Lemmatization:** Full lemmatization with POS tag filtering
+- **Stopword Removal:** 326 English stopwords with custom extension support
+- **Three Processing Modes:**
+  - `MINIMAL`: Basic cleaning only
+  - `STANDARD`: Cleaning + tokenization + stopword/punctuation removal
+  - `FULL`: Complete preprocessing with lemmatization
+
+**Additional Capabilities:**
+- Named Entity Recognition (NER) extraction
+- Part-of-speech (POS) tagging
+- Text statistics (tokens, sentences, unique tokens, etc.)
+- Batch processing with spaCy's `pipe()` for efficiency
+- Factory function for easy instantiation
+
+**Testing Results:**
+- All preprocessing modes working correctly
+- Successfully removes URLs, emails, and extra whitespace
+- Lemmatization reduces "years" → "year", "Kubernetes" → "kubernete"
+- Entity extraction functional (though some misclassifications expected)
+- Statistics tracking operational (58 tokens, 4 sentences, 326 stopwords)
+
+### Step 3.2: Implement Skill Extraction with KeyBERT
+
+**Status:** Completed
+**Timestamp:** 2025-11-20
+
+Created dual-component skill extraction system:
+
+#### SkillNormalizer Class
+**Purpose:** Maps skill variations to canonical forms
+
+**Skill Database:**
+- **80 canonical skills** across multiple categories:
+  - Programming Languages (15): Python, JavaScript, Java, C++, Go, Rust, etc.
+  - Web Technologies (11): React, Angular, Vue, Node.js, Django, Flask, etc.
+  - Databases (10): SQL, PostgreSQL, MongoDB, Redis, Elasticsearch, etc.
+  - Cloud & DevOps (12): AWS, Azure, GCP, Docker, Kubernetes, CI/CD, etc.
+  - ML & AI (10): Machine Learning, Deep Learning, TensorFlow, PyTorch, NLP, etc.
+  - Data & Analytics (10): Pandas, NumPy, Spark, Tableau, Power BI, etc.
+  - Testing (5): Unit Testing, Pytest, Jest, Selenium, etc.
+  - Soft Skills (7): Leadership, Communication, Problem Solving, Agile, etc.
+
+**Normalization Examples:**
+- "JS", "javascript", "JavaScript" → "javascript"
+- "k8s", "K8", "Kubernetes" → "kubernetes"
+- "ML", "Machine Learning" → "machine learning"
+- "DL", "Deep Learning" → "deep learning"
+
+**Capabilities:**
+- Bidirectional mapping (alias ↔ canonical)
+- Custom alias addition
+- Case-insensitive normalization
+
+#### SkillExtractor Class
+**Purpose:** Extract and match skills from text
+
+**Three Extraction Methods:**
+
+1. **KeyBERT Method:**
+   - Uses sentence-transformers (`all-MiniLM-L6-v2`)
+   - Extracts keyphrases with MMR for diversity
+   - Configurable n-gram range (1-3 by default)
+   - Returns scored skill list
+
+2. **spaCy Method:**
+   - Extracts noun chunks as potential skills
+   - Uses NER for technical entities (ORG, PRODUCT, GPE)
+   - Filters by phrase length (2-30 chars)
+   - Fast but less precise
+
+3. **Hybrid Method (Recommended):**
+   - Combines KeyBERT (70%) + spaCy (30%) scores
+   - Leverages strengths of both approaches
+   - Best balance of accuracy and coverage
+
+**Skill Matching Functionality:**
+- Compare resume skills vs. job requirements
+- Identify matched, missing, and extra skills
+- Calculate match percentage
+- Automatic normalization during comparison
+
+**Testing Results:**
+- Successfully extracts multi-word skills ("machine learning", "deep learning")
+- KeyBERT diversity parameter (0.5) prevents duplicate phrases
+- Hybrid method shows best skill diversity
+- Skill matching functional (though phrase-based extraction can be noisy)
+
+### Step 3.3: Build Unified Preprocessing Pipeline
+
+**Status:** Completed
+**Timestamp:** 2025-11-20
+
+Created `PreprocessingPipeline` class (`src/preprocessing_pipeline.py`) that unifies all preprocessing:
+
+**Architecture:**
+```
+Input Text → Clean → Tokenize → Lemmatize → Extract Skills → PreprocessedDocument
+```
+
+**PreprocessedDocument Data Class:**
+Stores complete processing results:
+- Original text, cleaned text, tokens, lemmas
+- Extracted skills with scores
+- Processing parameters (reproducibility)
+- Text statistics
+- Metadata (timestamp, doc_id, doc_type)
+- JSON serialization support
+
+**Pipeline Features:**
+
+1. **Configurable Processing:**
+   - All TextPreprocessor parameters (stopwords, lowercase, punctuation)
+   - All SkillExtractor parameters (method, top_n, diversity, normalization)
+   - Preprocessing mode selection (MINIMAL/STANDARD/FULL)
+
+2. **Document Processing:**
+   - `process_document()`: Generic document processing
+   - `process_resume()`: Resume-specific convenience method
+   - `process_job_posting()`: Job posting convenience method
+   - `process_batch()`: Efficient batch processing
+
+3. **Caching System:**
+   - JSON-based document cache
+   - Automatic cache lookup before processing
+   - Configurable cache directory
+   - Cache clearing functionality
+
+4. **Document Comparison:**
+   - Skill matching with percentage
+   - Token overlap calculation
+   - Lemma overlap calculation
+   - Complete comparison report
+
+5. **Metadata Tracking:**
+   - Pipeline configuration export
+   - Processing statistics
+   - Timestamp tracking
+   - Parameter versioning for reproducibility
+
+**Testing Results (Resume vs Job Posting):**
+- Resume: 735 chars → 71 tokens/lemmas, 15 skills extracted
+- Job Posting: 46 tokens/lemmas, 15 skills extracted
+- Skill Match: 6.7% (1 matched: "node.js")
+- Token Overlap: 45.9%
+- Lemma Overlap: 50.0%
+- Processing time: ~4 seconds per document (includes model loading)
+
+**Key Observations:**
+1. Hybrid skill extraction works but can be noisy (extracts long phrases)
+2. Skill normalization successfully maps variations
+3. Document comparison metrics provide multi-faceted similarity view
+4. Caching significantly improves repeat processing performance
+5. Metadata tracking enables experiment reproducibility
+
+**Next Steps:**
+- Phase 4: Embedding Generation & Vector Storage
+- Will use preprocessed text for embedding generation
+- Job chunking strategy for scalable search
+- FAISS index for efficient similarity search
 
 ---
 

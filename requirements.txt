@@ -18,6 +18,13 @@ spacy
 keybert
 
 # ====================
+# KEYWORD EXTRACTION (Experiments)
+# ====================
+yake
+rake-nltk
+nltk
+
+# ====================
 # VECTOR DATABASE & SIMILARITY
 # ====================
 faiss-cpu

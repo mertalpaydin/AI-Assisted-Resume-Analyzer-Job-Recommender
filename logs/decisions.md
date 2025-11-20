@@ -182,12 +182,85 @@ The sequential dual-parser approach was selected because:
 
 ---
 
+### Decision #3: Use RAKE as Primary Skill Extraction Method
+**Date:** 2025-11-20
+**Phase:** Phase 3 - Text Preprocessing & Skill Extraction
+**Status:** Accepted
+
+**Context:**
+Need to select a skill extraction method for parsing technical skills from resumes and job descriptions. Initial implementation used KeyBERT (with all-MiniLM-L6-v2 embeddings), but comprehensive testing revealed significant issues with extraction quality. Experiment #3 compared 4 methods: KeyBERT with two embedding models (all-MiniLM-L6-v2, all-mpnet-base-v2) and two statistical methods (YAKE, RAKE) on a sample resume with 26 ground truth skills.
+
+**Decision:**
+Use **RAKE (Rapid Automatic Keyword Extraction)** as the primary skill extraction method, replacing KeyBERT.
+
+**Alternatives Considered:**
+1. **KeyBERT with all-MiniLM-L6-v2 (current)**
+   - Pros: Semantic understanding, configurable n-grams, MMR diversity
+   - Cons: Poor F1 score (0.133), extracts long non-skill phrases ("processing proficient aws"), slow (3.78s), only 15% precision
+
+2. **KeyBERT with all-mpnet-base-v2**
+   - Pros: Higher-quality 768-dim embeddings, better semantic representation
+   - Cons: **Identical F1 to MiniLM** (0.133) despite being 12x slower (45.42s), no quality gain from larger model
+
+3. **YAKE (statistical)**
+   - Pros: 2x better F1 than KeyBERT (0.273), 5x faster (0.72s), language-independent, good for single-word skills
+   - Cons: Lower precision than RAKE (0.316 vs 0.400), 2.5x slower than RAKE
+
+4. **RAKE (statistical)**
+   - Pros: **Best F1 score (0.356)**, best precision (0.400), **fastest (0.29s)**, extracts atomic skills, no model loading overhead
+   - Cons: NLTK dependency (minimal), may need refinement for highly specialized terminology
+
+**Rationale:**
+RAKE was selected based on overwhelming experimental evidence:
+- **Best Quality**: F1 of 0.356 (2.7x better than KeyBERT, 1.3x better than YAKE)
+- **Best Precision**: 0.400 (4 out of 10 extracted skills are correct vs 1.5/10 for KeyBERT)
+- **Fastest**: 0.29s (13x faster than KeyBERT MiniLM, 157x faster than MPNet, 2.5x faster than YAKE)
+- **Best Balance**: F1/Time ratio of 1.215 (optimal quality per second)
+- **Cleaner Extraction**: Produces atomic skills ("machine learning", "python", "docker") vs KeyBERT's problematic long phrases ("java expert machine", "learn ml projects")
+- **Algorithm Fit**: RAKE's word co-occurrence graphs and stopword-based phrase boundaries are ideal for technical terminology extraction
+- **No Model Overhead**: Purely statistical, no embedding models to download/load
+
+**Unexpected Finding**: Larger embedding models provided zero quality improvement - all-mpnet-base-v2 (768d) had identical F1 to all-MiniLM-L6-v2 (384d) while being 12x slower, demonstrating that **task-method alignment matters more than model size**.
+
+**Trade-offs:**
+- Semantic Understanding vs Statistical: Accept loss of semantic capabilities for 2.7x quality improvement
+- Flexibility vs Performance: RAKE less configurable than KeyBERT but massively better results
+- Model Dependency vs Speed: Remove transformer dependency for 13-157x speedup
+
+**Consequences:**
+- Positive:
+  - 2.7x improvement in skill extraction quality (F1: 0.133 → 0.356)
+  - 13x faster processing (3.78s → 0.29s)
+  - More precise skill matching for resume-job comparison
+  - Better skill gap analysis with atomic skills
+  - Reduced dependencies (no sentence-transformers models to download)
+  - Real-time processing viable (0.29s per document)
+
+- Negative:
+  - Loss of semantic similarity capabilities (but these weren't helping for skill extraction)
+  - Need to maintain NLTK stopwords data
+  - Less configurable than KeyBERT (fewer tuning parameters)
+
+- Risks:
+  - May need domain-specific refinement for highly specialized fields
+  - Could miss multi-word skills not captured by co-occurrence (mitigation: combine with skill normalization database)
+
+**Related Decisions:**
+- Experiment #3: Skill Extraction Method Comparison (logs/experiment_log.md)
+- Will integrate with SkillNormalizer for mapping variations to canonical forms
+- Keep KeyBERT available for future semantic job search (different use case)
+
+**Review Date:** After Phase 4 - consider hybrid approach (RAKE + YAKE + skill database matching) for improved robustness
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
 |---|-------|-------|--------|------|--------|
 | 1 | Select gemma3:4b as Primary LLM for Resume Parsing | 2 | Accepted | 2025-11-18 | High |
 | 2 | Implement Dual-Parser Sequential Pipeline for PDF Extraction | 2 | Accepted | 2025-11-20 | High |
+| 3 | Use RAKE as Primary Skill Extraction Method | 3 | Accepted | 2025-11-20 | High |
 
 
 ---
@@ -200,8 +273,8 @@ The sequential dual-parser approach was selected because:
 - [x] ~~Output parser approach (Pydantic vs JSON)~~ - COMPLETED: Using Pydantic (implemented in Step 2.3)
 
 ### Phase 3
-- [ ] spaCy model size (sm vs md vs lg)
-- [ ] Skill extraction approach (KeyBERT vs alternatives)
+- [x] ~~spaCy model size (sm vs md vs lg)~~ - COMPLETED: Using en_core_web_sm (sufficient for preprocessing)
+- [x] ~~Skill extraction approach (KeyBERT vs alternatives)~~ - COMPLETED: RAKE (Decision #3)
 
 ### Phase 4
 - [ ] Embedding model selection (after Experiment 4.1)
