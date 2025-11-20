@@ -1,0 +1,132 @@
+================================================================================
+PDF PARSER QUALITY ASSESSMENT RESULTS
+================================================================================
+
+
+PDF: HARPER RUSSO.pdf
+Parser: PDFPLUMBER
+Parse Time: 0.431s
+Word Count: 523
+
+Field Presence (Score: 71.4%):
+  Email: True
+  Phone: True
+  Experience: True
+  Education: True
+  Skills: False
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+PDF: HARPER RUSSO.pdf
+Parser: PYPDF
+Parse Time: 0.199s
+Word Count: 3648
+
+Field Presence (Score: 28.6%):
+  Email: False
+  Phone: True
+  Experience: False
+  Education: False
+  Skills: False
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+PDF: Henry Wotton.pdf
+Parser: PDFPLUMBER
+Parse Time: 0.18s
+Word Count: 237
+
+Field Presence (Score: 100.0%):
+  Email: True
+  Phone: True
+  Experience: True
+  Education: True
+  Skills: True
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+PDF: Henry Wotton.pdf
+Parser: PYPDF
+Parse Time: 0.072s
+Word Count: 236
+
+Field Presence (Score: 100.0%):
+  Email: True
+  Phone: True
+  Experience: True
+  Education: True
+  Skills: True
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+PDF: Isabella Bella Ruiz.pdf
+Parser: PDFPLUMBER
+Parse Time: 0.095s
+Word Count: 480
+
+Field Presence (Score: 100.0%):
+  Email: True
+  Phone: True
+  Experience: True
+  Education: True
+  Skills: True
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+PDF: Isabella Bella Ruiz.pdf
+Parser: PYPDF
+Parse Time: 0.031s
+Word Count: 480
+
+Field Presence (Score: 100.0%):
+  Email: True
+  Phone: True
+  Experience: True
+  Education: True
+  Skills: True
+
+Text Quality:
+  Issues Found: 0
+  Has Garbled Chars: False
+  Has Excessive Whitespace: False
+--------------------------------------------------------------------------------
+
+================================================================================
+SUMMARY
+================================================================================
+Total tests: 6
+Average field presence score: 83.3%
+Average quality issues: 0.0
+Average parse time: 0.168s
+
+User Ratings (Average: 3.0/5.0):
+  HARPER RUSSO.pdf: 3/5
+    Feedback: could not handle strengths table
+  HARPER RUSSO.pdf: 1/5
+  Henry Wotton.pdf: 2/5
+    Feedback: could not handle the format well
+  Henry Wotton.pdf: 4/5
+    Feedback: the order of the text is off but handled the format good
+  Isabella Bella Ruiz.pdf: 4/5
+    Feedback: could not handle the skills table and the name
+  Isabella Bella Ruiz.pdf: 4/5

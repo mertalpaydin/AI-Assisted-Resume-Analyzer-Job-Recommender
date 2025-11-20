@@ -11,9 +11,13 @@ Phase: Phase 2 - Step 2.1
 
 import time
 import json
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
 import ollama
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from logging_utils import setup_logger, log_experiment
 
 # Initialize logger

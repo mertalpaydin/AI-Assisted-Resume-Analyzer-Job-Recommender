@@ -39,7 +39,8 @@
 ## Phase 2: Resume Parsing & Structured Extraction
 
 **Start Date:** 2025-11-18
-**Status:** In Progress
+**End Date:** 2025-11-20
+**Status:** Completed
 
 ### Step 2.1: Verify & Test Local LLM Models
 
@@ -90,6 +91,82 @@ Implemented rigorous testing with:
 - llama3.2:3b: 3.02s, 50.0% quality, 1 error + 2 warnings, 3/4 runs succeeded
 
 **Next:** Build PDF parser with LangChain and test with actual PDF samples.
+
+### Step 2.2: Build PDF Parser with LangChain
+
+**Status:** Completed
+**Timestamp:** 2025-11-20
+
+Implemented `PDFResumeParser` with dual library support:
+- **PDFPlumber**: Primary parser, table-aware, better field detection (90.5% avg)
+- **PyPDF**: Fallback parser, faster (2.3x), better format handling (76.2% avg)
+
+**Key Findings from Quality Assessment (3 challenging fake resumes):**
+- Both parsers averaged 3.0/5 user rating - neither definitively superior
+- PDFPlumber: Better at field detection but struggles with complex tables
+- PyPDF: Faster but inconsistent field detection, better text ordering
+- Different parsers excel at different resume formats (complementary strengths)
+
+**Decision:** Implement dual-parser sequential pipeline to leverage both strengths
+
+### Step 2.3: Define Pydantic Resume Schema
+
+**Status:** Completed
+**Timestamp:** 2025-11-18
+
+Created comprehensive Pydantic V2 schema (`resume_schema.py`):
+- Main model: `Resume` with nested `ExperienceEntry` and `EducationEntry`
+- Field validators for email, phone, skills (with deduplication)
+- Support for: contact info, experience, skills, education, certifications, languages, projects
+- Added `additional_sections` dict for uncategorized content (Awards, Volunteer, Publications, etc.)
+- JSON schema generation for LLM prompts
+
+### Step 2.4 & 2.5: Dual-Parser Resume Extractor & Validation
+
+**Status:** Completed
+**Timestamp:** 2025-11-20
+
+Implemented `ResumeExtractor` with dual-parser sequential pipeline:
+
+**Architecture:**
+1. **First Pass**: PDFPlumber → LLM extraction → Pydantic validation
+2. **Second Pass**: PyPDF → LLM refinement (with previous JSON as context) → Pydantic validation
+3. **Fallback**: If second pass fails, returns first pass result (ensures 100% success rate)
+
+**Test Results (3 fake resumes, gemma3:4b @ temp=0.1):**
+
+| Resume | Pipeline Mode | Result | Time | Skills | Experience | Education | Certs |
+|--------|---------------|--------|------|--------|------------|-----------|-------|
+| Harper Russo | Single-parser (refinement failed) | ✓ SUCCESS | 30.64s | 34 | 2 | 1 | 3 |
+| Henry Wotton | Dual-parser ✓ | ✓ SUCCESS | 20.25s | 10 | 2 | 1 | 2 |
+| Isabella Bella Ruiz | Dual-parser ✓ | ✓ SUCCESS | 35.55s | 19 | 2 | 1 | 3 |
+
+**Success Rate:**
+- Overall: 100% (3/3 extractions succeeded)
+- Dual-parser success: 67% (2/3 succeeded with refinement)
+- Fallback effectiveness: 100% (Harper Russo fell back gracefully)
+
+**Key Findings:**
+1. **Fallback mechanism is critical** - Ensures 100% extraction success rate even when refinement fails
+2. **Refinement prompt engineering matters** - Fixed field name errors with explicit schema requirements
+3. **Dual-parser adds value when successful** - Henry Wotton completed in 20.25s (faster than single-parser)
+4. **JSON repair function helps** - Fixes common LLM formatting issues (trailing commas, missing commas)
+5. **Remaining issues**: Occasional JSON syntax errors from LLM on complex resumes (Harper Russo)
+6. **Name extraction quirk**: Some resumes have spaced names ("H A R P E R R U S S O") from PDF formatting
+
+**Validation Framework:**
+- Comprehensive quality scoring (0-100%)
+- Section-level validation (contact, experience, education, skills)
+- Retry logic with quality threshold (>= 50%)
+- Detailed error reporting with issue/warning classification
+
+**Code Organization:**
+- Moved test scripts to `tests/` folder for better structure
+- Updated imports in test scripts to reference `src/` modules
+- Core modules in `src/`: resume_extractor, pdf_parser, resume_schema, extraction_validator, logging_utils
+- Test modules in `tests/`: test_llm_models, test_pdf_quality
+
+**Next:** Test with more diverse resume formats, move to Phase 3 (Text Preprocessing & Skill Extraction)
 
 ---
 

@@ -13,8 +13,12 @@ from pathlib import Path
 from typing import Dict, Any, List
 import re
 import json
+import sys
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from pdf_parser import PDFResumeParser
-from logging_utils import setup_logger, log_experiment
+from logging_utils import setup_logger
 
 logger = setup_logger(__name__)
 
@@ -45,7 +49,7 @@ class PDFQualityValidator:
             'has_education_section': any(keyword in text_lower for keyword in
                                         ['education', 'academic', 'degree', 'university', 'college']),
             'has_skills_section': any(keyword in text_lower for keyword in
-                                     ['skills', 'technical skills', 'competencies', 'technologies']),
+                                     ['skills', 'strenghts', 'technical skills', 'competencies', 'technologies']),
             'has_name_candidate': len(text.split('\n')[0].split()) <= 5,  # First line is usually name
             'has_reasonable_length': 100 < len(text.split()) < 5000,  # Between 100-5000 words
         }
@@ -182,7 +186,7 @@ def run_quality_assessment(with_user_rating: bool = False):
     validator = PDFQualityValidator()
 
     # Get ALL sample PDFs
-    samples_dir = Path(__file__).parent.parent / "data" / "cv_samples" / "ai generated"
+    samples_dir = Path(__file__).parent.parent / "data" / "cv_samples"
     pdf_files = list(samples_dir.glob("*.pdf"))  # ALL PDFs
 
     logger.info(f"Testing {len(pdf_files)} PDFs with BOTH parsers (PDFPlumber & PyPDF)")
@@ -238,18 +242,17 @@ def run_quality_assessment(with_user_rating: bool = False):
             print(f"        - Words: {text_quality['word_count']}")
             print(f"        - Parse Time: {parse_result['metadata']['parse_time_seconds']}s")
 
-            # Add to CSV (without user rating for now)
-            csv_row = f"{pdf_file.name},{parser_name},True,{parse_result['metadata']['parse_time_seconds']},{text_quality['word_count']},{field_presence['has_email']},{field_presence['has_phone']},{field_presence['has_experience_section']},{field_presence['has_education_section']},{field_presence['has_skills_section']},{field_presence['quality_score']:.3f},{text_quality['issue_count']},N/A,N/A"
-            csv_rows.append(csv_row)
-
-            # User rating if requested (only for pdfplumber to avoid redundancy)
-            if with_user_rating and parser_name == 'pdfplumber':
+            # User rating for BOTH parsers to compare them
+            user_rating_str = "N/A,N/A"
+            if with_user_rating:
                 user_rating = validator.user_rate_extraction(pdf_file, parse_result['text'])
                 user_ratings.append(user_rating)
                 result['user_rating'] = user_rating
+                user_rating_str = f"{user_rating['rating']},{user_rating['feedback']}"
 
-                # Update CSV row with user rating
-                csv_rows[-1] = csv_row.replace(',N/A,N/A', f",{user_rating['rating']},{user_rating['feedback']}")
+            # Add to CSV with user rating
+            csv_row = f"{pdf_file.name},{parser_name},True,{parse_result['metadata']['parse_time_seconds']},{text_quality['word_count']},{field_presence['has_email']},{field_presence['has_phone']},{field_presence['has_experience_section']},{field_presence['has_education_section']},{field_presence['has_skills_section']},{field_presence['quality_score']:.3f},{text_quality['issue_count']},{user_rating_str}"
+            csv_rows.append(csv_row)
 
     # Summary
     print("\n" + "="*80)
@@ -288,22 +291,8 @@ def run_quality_assessment(with_user_rating: bool = False):
                     if rating['feedback'] != "No feedback provided":
                         print(f"      Feedback: {rating['feedback']}")
 
-    # Save results as JSON, CSV, and TXT
+    # Save results as CSV, and TXT
     logs_dir = Path(__file__).parent.parent / "logs"
-
-    # JSON
-    json_file = logs_dir / "pdf_quality_assessment.json"
-    with open(json_file, 'w', encoding='utf-8') as f:
-        json.dump({
-            'automated_results': all_results,
-            'user_ratings': user_ratings if user_ratings else None,
-            'summary': {
-                'avg_field_presence_score': avg_field_score,
-                'avg_quality_issues': avg_issues,
-                'avg_parse_time': avg_parse_time,
-                'avg_user_rating': avg_rating if user_ratings and valid_ratings else None
-            }
-        }, f, indent=2)
 
     # CSV
     csv_file = logs_dir / "pdf_quality_assessment.csv"
@@ -352,7 +341,6 @@ def run_quality_assessment(with_user_rating: bool = False):
 
     print(f"\n{'='*80}")
     print("RESULTS SAVED:")
-    print(f"  JSON: {json_file}")
     print(f"  CSV:  {csv_file}")
     print(f"  TXT:  {txt_file}")
     print("="*80)

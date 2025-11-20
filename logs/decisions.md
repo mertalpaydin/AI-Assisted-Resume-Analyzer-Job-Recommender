@@ -110,11 +110,84 @@ gemma3:4b was selected despite being the slowest model because:
 
 ---
 
+### Decision #2: Implement Dual-Parser Sequential Pipeline for PDF Extraction
+**Date:** 2025-11-20
+**Phase:** Phase 2 - Resume Parsing & Structured Extraction
+**Status:** Accepted
+
+**Context:**
+After testing PDFPlumber and PyPDF on 3 challenging resume samples with varied formats (tables, multi-column layouts), both parsers showed complementary strengths and weaknesses. PDFPlumber achieved 90.5% field detection but struggled with table extraction. PyPDF was 2.3x faster (0.101s vs 0.235s) and better at format handling but had inconsistent field detection (76.2%). Both received identical user ratings (3.0/5), indicating neither alone provides sufficient quality for production use.
+
+**Decision:**
+Implement a **dual-parser sequential pipeline** where both parsers are used in succession:
+1. **First pass**: Parse PDF with PDFPlumber → LLM extracts initial structured JSON
+2. **Second pass**: Parse PDF with PyPDF → LLM receives new text + previous JSON → refines/improves extraction
+
+**Alternatives Considered:**
+1. **PDFPlumber only**
+   - Pros: Better field detection (90.5%), table-aware parsing, structured extraction
+   - Cons: Struggles with complex tables (user feedback: "could not handle strengths table", "could not handle skills table"), slower (0.235s), missed formatting nuances
+
+2. **PyPDF only**
+   - Pros: Faster (0.101s, 2.3x speedup), better format handling, good text preservation
+   - Cons: Inconsistent field detection (76.2%), text ordering issues, poor performance on Harper Russo resume (1/5 rating, 3648 words extracted vs expected ~500)
+
+3. **Parallel dual-parser with voting/merging**
+   - Pros: Could leverage both parsers simultaneously
+   - Cons: Complex merging logic, potential conflicts, no clear resolution strategy for disagreements, wouldn't benefit from sequential refinement
+
+4. **Dynamic parser selection based on PDF characteristics**
+   - Pros: Could optimize for specific resume formats
+   - Cons: Requires upfront classification, may misclassify, doesn't combine strengths of both parsers
+
+**Rationale:**
+The sequential dual-parser approach was selected because:
+- **Complementary strengths**: PDFPlumber's field detection + PyPDF's format handling = comprehensive extraction
+- **Refinement paradigm**: Second LLM pass can fill gaps, correct errors, and improve completeness using context from first pass
+- **Handles edge cases**: Different parsers excel at different formats (e.g., Henry Wotton: PyPDF 4/5 vs PDFPlumber 2/5)
+- **No clear winner**: Both parsers tied at 3.0/5 user rating, suggesting both contribute value
+- **LLM-powered fusion**: LLM can intelligently merge information from both sources rather than hard-coded logic
+- **Minimal cost**: Additional 0.1s parse time + ~15s LLM time is acceptable for offline resume processing
+- **User feedback validation**: Issues like "could not handle table" (PDFPlumber) and "order off" (PyPDF) are addressed by combining both
+
+**Trade-offs:**
+- Speed vs Quality: Accept 2x parse time (0.235s + 0.101s = 0.336s) + 2x LLM calls (~30s total) for improved extraction quality
+- Complexity vs Robustness: More complex pipeline but significantly more robust to varied resume formats
+- Cost vs Accuracy: Double PDF parsing + LLM calls, but critical for production-quality extraction
+
+**Consequences:**
+- Positive:
+  - Higher field completeness and accuracy across diverse resume formats
+  - Better table handling (PyPDF can supplement PDFPlumber's table gaps)
+  - Better text ordering (PDFPlumber can supplement PyPDF's ordering issues)
+  - More robust to format variations (leverages strengths of both parsers)
+  - LLM can intelligently reconcile differences and prefer better extraction
+
+- Negative:
+  - ~0.1s additional parse time (minor impact)
+  - ~15s additional LLM inference time (acceptable for offline processing)
+  - Increased complexity in ResumeExtractor implementation
+  - Need to design refinement prompt carefully
+
+- Risks:
+  - Second LLM pass could introduce errors if not prompted correctly
+  - May need prompt engineering to prevent second pass from overwriting correct first-pass data
+  - Potential for information conflicts between parsers (mitigation: instruct LLM to prefer more complete/coherent data)
+
+**Related Decisions:**
+- Decision #1: Select gemma3:4b as Primary LLM (used for both passes)
+- Experiment #2: PDF Parser Comparison (logs/experiment_log.md)
+
+**Review Date:** After Phase 2 completion - evaluate extraction quality improvement, consider optimizations if latency becomes an issue
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
 |---|-------|-------|--------|------|--------|
 | 1 | Select gemma3:4b as Primary LLM for Resume Parsing | 2 | Accepted | 2025-11-18 | High |
+| 2 | Implement Dual-Parser Sequential Pipeline for PDF Extraction | 2 | Accepted | 2025-11-20 | High |
 
 
 ---
@@ -122,9 +195,9 @@ gemma3:4b was selected despite being the slowest model because:
 ## Decisions to Make (Future)
 
 ### Phase 2
-- [ ] PDF parsing library selection (after Experiment 2.2)
+- [x] ~~PDF parsing library selection (after Experiment 2.2)~~ - COMPLETED: Dual-parser pipeline (Decision #2)
 - [x] ~~LLM model selection for resume parsing (after Experiment 2.1)~~ - COMPLETED: gemma3:4b (Decision #1)
-- [ ] Output parser approach (Pydantic vs JSON)
+- [x] ~~Output parser approach (Pydantic vs JSON)~~ - COMPLETED: Using Pydantic (implemented in Step 2.3)
 
 ### Phase 3
 - [ ] spaCy model size (sm vs md vs lg)

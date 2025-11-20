@@ -1,0 +1,7 @@
+PDF_File,Parser,Success,Parse_Time_s,Word_Count,Has_Email,Has_Phone,Has_Experience,Has_Education,Has_Skills,Field_Score,Quality_Issues,User_Rating,User_Feedback
+HARPER RUSSO.pdf,pdfplumber,True,0.431,523,True,True,True,True,False,0.714,0,3,could not handle strengths table
+HARPER RUSSO.pdf,pypdf,True,0.199,3648,False,True,False,False,False,0.286,0,1,No feedback provided
+Henry Wotton.pdf,pdfplumber,True,0.18,237,True,True,True,True,True,1.000,0,2,could not handle the format well
+Henry Wotton.pdf,pypdf,True,0.072,236,True,True,True,True,True,1.000,0,4,the order of the text is off but handled the format good
+Isabella Bella Ruiz.pdf,pdfplumber,True,0.095,480,True,True,True,True,True,1.000,0,4,could not handle the skills table and the name
+Isabella Bella Ruiz.pdf,pypdf,True,0.031,480,True,True,True,True,True,1.000,0,4,No feedback provided

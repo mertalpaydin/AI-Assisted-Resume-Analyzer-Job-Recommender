@@ -3,47 +3,49 @@
 
 **Project Goal:** Build an end-to-end NLP pipeline that matches resumes to relevant job postings, identifies skill gaps, and provides recommendations.
 
-**Learning Log:** Document findings, decisions, and experiments at each stage.
+**Learning Log:** Document findings, decisions, and experiments at each stage as a summary. Needs to be updated after completed of each Phase.
+**Experiment Log:** Document experiments at each stage. Needs to be updated after completion of each experiment.
+**Decision Log:** Document decisions such as with Ollama model to use at each stage. Needs to be updated after each decision.
 
 ---
 
 ## Phase 0: Documentation & Logging Infrastructure (PRIORITY)
 
 ### Step 0.1: Initialize Documentation Structure
-- [ ] Create `/logs/learning_log.md` - main learning documentation file
-  - [ ] Add header with project name, start date, learning objectives
-  - [ ] Create sections for each phase (to be updated continuously)
-  - [ ] Use consistent markdown formatting
+- [x] Create `/logs/learning_log.md` - main learning documentation file
+  - [x] Add header with project name, start date, learning objectives
+  - [x] Create sections for each phase (to be updated continuously)
+  - [x] Use consistent markdown formatting
 
-- [ ] Create `/logs/experiment_log.md` - detailed experiment tracking
-  - [ ] Initialize experiment counter
-  - [ ] Create template section for standardized logging
+- [x] Create `/logs/experiment_log.md` - detailed experiment tracking
+  - [x] Initialize experiment counter
+  - [x] Create template section for standardized logging
 
-- [ ] Create `/logs/decisions.md` - architectural and technical decisions
-  - [ ] Track rationale for each major choice
-  - [ ] Document trade-offs considered
+- [x] Create `/logs/decisions.md` - architectural and technical decisions
+  - [x] Track rationale for each major choice
+  - [x] Document trade-offs considered
 
-- [ ] Create `/logs/challenges.md` - problems encountered and solutions
-  - [ ] Document issues as they arise
-  - [ ] Note resolution approaches
+- [x] Create `/logs/challenges.md` - problems encountered and solutions
+  - [x] Document issues as they arise
+  - [x] Note resolution approaches
 
-- [ ] Set up logging in code:
-  - [ ] Configure Python logging module in all scripts
-  - [ ] Log to both console and `/logs/debug.log`
-  - [ ] Include timestamps, module names, and function information
+- [x] Set up logging in code:
+  - [x] Configure Python logging module in all scripts
+  - [x] Log to both console and `/logs/debug.log`
+  - [x] Include timestamps, module names, and function information
 
 ### Step 0.2: Create Logging Helper Module
-- [ ] Create `src/logging_utils.py`:
-  - [ ] Centralized logging configuration
-  - [ ] Functions to log experiments, decisions, and findings
-  - [ ] Easy-to-use wrappers for documentation capture
+- [x] Create `src/logging_utils.py`:
+  - [x] Centralized logging configuration
+  - [x] Functions to log experiments, decisions, and findings
+  - [x] Easy-to-use wrappers for documentation capture
 
-- [ ] Create documentation checkpoint function:
-  - [ ] After each major step, log key findings
-  - [ ] Record metrics and observations
-  - [ ] Timestamp entries
+- [x] Create documentation checkpoint function:
+  - [x] After each major step, log key findings
+  - [x] Record metrics and observations
+  - [x] Timestamp entries
 
-**Critical Principle:** From this point forward, **after every completed step or experiment, immediately update the learning logs**. Do not defer documentation to the end.
+**Critical Principle:** From this point forward, **after every completed step or experiment, immediately update the learning logs, decisions and experiment log. Do not defer documentation to the end.**
 
 ---
 
@@ -113,71 +115,68 @@
   - [x] Use LangChain's document loaders (PDFPlumber or PyPDF)
   - [x] Extract raw text from PDFs
   - [x] Handle multi-page resumes
-  - [ ] Test on sample resumes
+  - [x] Test on sample resumes
 
-- [ ] **Experiment Log:** Try multiple PDF loading strategies:
-  - [ ] Different page extraction methods
-  - [ ] Handling of special formatting (tables, columns)
-  - [ ] Performance metrics for each approach
+- [x] **Experiment Log:** Try multiple PDF loading strategies:
+  - [x] Different page extraction methods
+  - [x] Handling of special formatting (tables, columns)
+  - [x] Performance metrics for each approach
 
-**ToDo:** Testing to be done with sample resumes 
+### Step 2.3: Design Resume JSON Schema ✓ COMPLETED
+- [x] Define structured output schema with fields:
+  - [x] Full resume schema with contact info, experience, education, skills, certifications, languages, projects
+  - [x] Nested models for ExperienceEntry and EducationEntry
+  - [x] Optional fields for LinkedIn, GitHub, website, location
 
-### Step 2.3: Design Resume JSON Schema
-- [ ] Define structured output schema with fields:
-  ```json
-  {
-    "full_name": "string",
-    "email": "string",
-    "phone": "string",
-    "summary": "string",
-    "experience": [
-      {
-        "company": "string",
-        "position": "string",
-        "duration": "string",
-        "description": "string"
-      }
-    ],
-    "skills": ["string"],
-    "education": [
-      {
-        "institution": "string",
-        "degree": "string",
-        "field": "string"
-      }
-    ],
-    "certifications": ["string"]
-  }
-  ```
+- [x] Create Pydantic models for type validation
+  - [x] Implemented with Pydantic V2 (ConfigDict)
+  - [x] Field validators for name, email, phone, skills
+  - [x] Automatic deduplication for skills list
+  - [x] Comprehensive validation and cleaning
 
-- [ ] Create Pydantic models for type validation
+**RESULT:** Complete Pydantic schema in `src/resume_schema.py` with validation, tested and working
 
-### Step 2.4: Build LLM-Powered Resume Extractor
-- [ ] Create `resume_extractor.py` using LangChain:
-  - [ ] Craft prompt template for structured extraction
-  - [ ] Use LangChain's output parsers (JsonOutputParser, PydanticOutputParser)
-  - [ ] Chain together: PDF text → LLM → Structured JSON
-  
-- [ ] Test on sample resumes:
-  - [ ] Verify JSON schema compliance
-  - [ ] Check extraction accuracy for each field
-  - [ ] Measure latency and token usage
+### Step 2.4: Build LLM-Powered Resume Extractor ✓ COMPLETED
+- [x] Create `resume_extractor.py` using LangChain:
+  - [x] Craft prompt template for structured extraction (with clear instructions to avoid hallucination)
+  - [x] Use Pydantic output parser for validation
+  - [x] Chain together: PDF text → gemma3:4b LLM → Structured JSON → Pydantic validation
+  - [x] Integrated with PDFResumeParser (with fallback support)
 
-- [ ] **Experiment Log:** Test different prompting strategies:
-  - [ ] Few-shot prompting with examples
-  - [ ] Chain-of-thought prompting
-  - [ ] Alternative output parsing methods
-  - [ ] Document accuracy improvements
+- [x] Implementation features:
+  - [x] End-to-end extraction pipeline (PDF → Resume object)
+  - [x] Batch processing support
+  - [x] Comprehensive metadata tracking (timing, counts, model info)
+  - [x] Low temperature (0.1) for consistent extraction
+  - [x] JSON extraction with error handling
 
-### Step 2.5: Build Error Handling & Validation
-- [ ] Add validation for:
-  - [ ] Missing critical fields
-  - [ ] Email/phone format validation
-  - [ ] Skill name normalization
-  
-- [ ] Implement retry logic for LLM failures
-- [ ] Create logging for extraction confidence scores
-- [ ] **Learning Log:** Document common extraction errors and solutions
+- [x] Test on sample resumes:
+  - [x] Verify JSON schema compliance
+  - [x] Check extraction accuracy for each field
+  - [x] Measure latency and token usage
+
+**RESULT:** Complete extraction pipeline in `src/resume_extractor.py`. Testing done, and logged. Going with dual parser approach.
+
+### Step 2.5: Build Error Handling & Validation ✓ COMPLETED
+- [x] Add validation for:
+  - [x] Missing critical fields (contact info, experience, education, skills)
+  - [x] Email/phone format validation
+  - [x] Skill name normalization and deduplication
+  - [x] Section-by-section quality checks
+
+- [x] Implement retry logic for LLM failures
+  - [x] Automatic retry up to 2 attempts
+  - [x] Quality score threshold (minimum 50%)
+  - [x] Metadata tracking for all attempts
+
+- [x] Create logging for extraction confidence scores
+  - [x] Quality scoring system (0-100%)
+  - [x] Issue and warning tracking
+  - [x] Detailed validation reports
+
+**RESULT:** Complete validation framework in `src/extraction_validator.py` with retry logic and quality scoring
+
+**Phase 2 Summary:** All implementation and testing completed!
 
 ---
 
@@ -233,7 +232,8 @@
 ### Step 4.1: Intelligent Job Chunking
 - [ ] Create `JobChunker` class:
   - [ ] Semantic chunking (split by sections: title, description, requirements)
-  - [ ] Mark each chunk with job_id
+  - [ ] if a section is too large split to chunks again based on max_char
+  - [ ] Mark each chunk with job_id and chunk_num for easier reconstruction
   - [ ] Track chunk importance (title > requirements > description)
   - [ ] Add overlap for context preservation
   - [ ] Test on sample jobs
@@ -321,9 +321,8 @@
 - [ ] Create `matching_engine.py`:
   - [ ] For uploaded resume:
     1. Parse and extract structured data
-    2. Preprocess and extract skills
-    3. Generate embeddings
-    4. Query FAISS for similar jobs
+    2. Generate embeddings
+    3. Query FAISS for similar jobs
   
   - [ ] Implement ranking strategies:
     - [ ] Weighted similarity scores (job description + title + skills)
@@ -390,7 +389,6 @@
 
 ### Step 6.1: Build LLM-Powered CV Improvement Module
 - [ ] Create `cv_improvemer.py`:
-  - [ ] Use LangChain to orchestrate LLM suggestions
   - [ ] Analyze resume against top matching job postings
   - [ ] Generate suggestions for:
     - [ ] Missing skills to develop
@@ -400,6 +398,7 @@
 
 - [ ] **Experiment Log:** Test different suggestion generation strategies:
   - [ ] Different LLMs (Ollama models)
+  - [ ] Try Gemini API calls, compare accuracy and latency vs Ollama models
   - [ ] Prompt engineering variations
   - [ ] Few-shot examples
   - [ ] Chain-of-thought reasoning
