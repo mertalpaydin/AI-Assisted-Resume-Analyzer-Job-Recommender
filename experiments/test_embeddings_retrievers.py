@@ -32,9 +32,9 @@ from job_chunker import JobChunker, load_jobs_from_jsonl
 from job_id_mapper import JobIDMapper
 from embedding_generator import ChunkEmbeddingGenerator
 from vector_store import ChunkVectorStore
+from logging_utils import setup_logger
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__)
 
 # Check CUDA availability
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -43,26 +43,26 @@ if DEVICE == 'cuda':
     print(f"GPU: {torch.cuda.get_device_name(0)}")
 
 
-class OllamaEmbeddingGenerator:
-    """Wrapper for Ollama embedding models."""
+class EmbeddingGemmaGenerator:
+    """Wrapper for EmbeddingGemma via sentence-transformers."""
 
-    def __init__(self, model_name: str = 'embeddinggemma', embedding_dim: int = 768):
-        import ollama
+    def __init__(self, model_name: str = 'google/embeddinggemma-300m'):
+        from sentence_transformers import SentenceTransformer
         self.model_name = model_name
-        self.client = ollama
-        self.embedding_dim = embedding_dim
+        self.model = SentenceTransformer(model_name)
+        if DEVICE == 'cuda':
+            self.model = self.model.to(DEVICE)
+        self.embedding_dim = 768
 
     def embed_text(self, text: str) -> np.ndarray:
-        response = self.client.embed(model=self.model_name, input=text)
-        return np.array(response['embeddings'][0], dtype='float32')
+        # Use encode_query for query texts
+        return self.model.encode_query(text).astype('float32')
 
     def embed_texts(self, texts, show_progress=True):
-        embeddings = []
-        for i, text in enumerate(texts):
-            if show_progress and i % 50 == 0:
-                print(f"  Embedding {i}/{len(texts)}...")
-            embeddings.append(self.embed_text(text))
-        return np.array(embeddings, dtype='float32')
+        # Use encode_document for document texts
+        if show_progress:
+            print(f"  Embedding {len(texts)} texts...")
+        return self.model.encode_document(texts, show_progress_bar=show_progress).astype('float32')
 
     def embed_chunks(self, chunks, show_progress=True):
         texts = [chunk.text for chunk in chunks]
@@ -135,7 +135,7 @@ def run_embedding_model_experiment(jobs, all_chunks, mapper):
     models = [
         ('all-MiniLM-L6-v2', 384, 'sentence-transformers'),
         ('all-mpnet-base-v2', 768, 'sentence-transformers'),
-        ('embeddinggemma:latest', 768, 'ollama'),
+        ('google/embeddinggemma-300m', 768, 'embeddinggemma'),
     ]
 
     print(f"\nTest data: {len(jobs)} jobs, {len(all_chunks)} chunks")
@@ -164,8 +164,8 @@ def run_embedding_model_experiment(jobs, all_chunks, mapper):
         try:
             # Load model with CUDA support
             start_time = time.time()
-            if model_type == 'ollama':
-                generator = OllamaEmbeddingGenerator(model_name=model_name)
+            if model_type == 'embeddinggemma':
+                generator = EmbeddingGemmaGenerator(model_name=model_name)
                 dim = generator.embedding_dim
             else:
                 generator = ChunkEmbeddingGenerator(model_name=model_name)
@@ -396,11 +396,16 @@ def save_experiment_results(embed_results, retrieval_results, output_path):
 
 
 if __name__ == "__main__":
+    logger.info("=" * 70)
+    logger.info("PHASE 4 EXPERIMENT: Embedding Models & Retrieval Strategies")
+    logger.info("=" * 70)
+
     # Load test data (500 jobs for comprehensive experiments)
     data_path = Path(__file__).parent.parent / "data" / "techmap-jobs_us_2023-05-05.json"
 
     NUM_JOBS = 500  # Increase for more comprehensive testing
 
+    logger.info(f"Loading {NUM_JOBS} jobs for experiments...")
     print(f"Loading {NUM_JOBS} jobs for experiments...")
     jobs = load_jobs_from_jsonl(str(data_path), limit=NUM_JOBS)
 
@@ -439,10 +444,23 @@ if __name__ == "__main__":
     # Print summary
     print_experiment_summary(embed_results, retrieval_results)
 
+    # Log results
+    logger.info("EMBEDDING MODEL RESULTS:")
+    for model, data in embed_results.items():
+        if 'error' not in data:
+            logger.info(f"  {model}: Precision={data['avg_precision']:.3f}, Speed={data['chunks_per_sec']:.1f}/s")
+
+    logger.info("RETRIEVAL STRATEGY RESULTS:")
+    for strategy, data in retrieval_results.items():
+        logger.info(f"  {strategy}: Precision={data['avg_precision']:.3f}, Companies={data['avg_unique_companies']:.1f}/10")
+
     # Save results
     output_path = Path(__file__).parent / "results" / "phase4_experiment_results.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     save_experiment_results(embed_results, retrieval_results, output_path)
+
+    logger.info(f"Results saved to: {output_path}")
+    logger.info("PHASE 4 EXPERIMENT COMPLETE")
 
     print("\n" + "="*80)
     print("EXPERIMENT COMPLETE")

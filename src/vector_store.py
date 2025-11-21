@@ -32,7 +32,7 @@ class ChunkVectorStore:
 
     def __init__(
         self,
-        embedding_dim: int = 384,
+        embedding_dim: int = 768,
         index_type: str = 'flat'
     ):
         """

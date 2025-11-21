@@ -4,6 +4,8 @@
 # ====================
 # CORE NLP & ML
 # ====================
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch
 langchain
 langchain-community
 sentence-transformers

@@ -55,14 +55,14 @@ Use this template for each experiment:
 
 ## Experiment Counter
 
-**Total Experiments Conducted:** 3
+**Total Experiments Conducted:** 4
 
 **By Phase:**
 - Phase 0: 0
 - Phase 1: 0
 - Phase 2: 2
 - Phase 3: 1
-- Phase 4: 0
+- Phase 4: 1
 - Phase 5: 0
 - Phase 6: 0
 - Phase 7: 0
@@ -109,6 +109,7 @@ Use this template for each experiment:
 | 1 | LLM Model Comparison | 2 | gemma3:4b | Quality Score | 100.0% | 2025-11-18 |
 | 2 | PDF Parser Comparison | 2 | Both (Pipeline) | User Rating | 3.0/5 (both) | 2025-11-20 |
 | 3 | Skill Extraction Method Comparison | 3 | RAKE | F1 Score | 0.356 | 2025-11-20 |
+| 4 | Embedding Model & Retrieval Strategy | 4 | embeddinggemma + MMR 0.5 | Precision@10 | 0.980 | 2025-11-21 |
 
 ---
 
@@ -345,3 +346,83 @@ RAKE significantly outperformed all methods across all key metrics:
 - Test RAKE on diverse resume/job formats (different industries, experience levels)
 - Explore hybrid approach combining RAKE + YAKE + skill database matching
 - Consider domain-specific embeddings experiment in future (CodeBERT for programming skills)
+
+---
+
+### Experiment #4: Embedding Model & Retrieval Strategy Comparison
+**Date:** 2025-11-21
+**Phase:** Phase 4 - Embedding Generation & Vector Storage
+**Objective:** Compare embedding models (all-MiniLM-L6-v2 vs all-mpnet-base-v2 vs google/embeddinggemma-300m) and retrieval strategies (Cosine vs MMR with various lambda values) to find optimal job search configuration.
+
+**Hypothesis:** EmbeddingGemma will provide better semantic understanding for job matching, and MMR will improve result diversity without sacrificing relevance.
+
+**Options Tested (Embedding Models):**
+1. **all-MiniLM-L6-v2**
+   - Configuration: 384-dim embeddings, sentence-transformers, CUDA GPU
+   - Results: Precision@10: 0.850, Diversity: 9.5/10, Speed: 1489.2 chunks/sec, Memory: 5.31 MB
+   - Observations: Fastest model, good baseline quality, smallest memory footprint
+
+2. **all-mpnet-base-v2**
+   - Configuration: 768-dim embeddings, sentence-transformers, CUDA GPU
+   - Results: Precision@10: 0.860, Diversity: 9.6/10, Speed: 242.3 chunks/sec, Memory: 10.63 MB
+   - Observations: Marginal quality improvement over MiniLM, 6x slower
+
+3. **google/embeddinggemma-300m**
+   - Configuration: 768-dim embeddings, sentence-transformers with encode_query/encode_document, CUDA GPU
+   - Results: Precision@10: **0.980**, Diversity: 9.7/10, Speed: 147.4 chunks/sec, Memory: 10.63 MB
+   - Observations: **Best quality by far** (12-13% improvement), uses asymmetric query/document encoding
+
+**Options Tested (Retrieval Strategies):**
+1. **Cosine Similarity**
+   - Results: Precision: 0.850, Companies: 9.5/10, Categories: 3.5, Time: 0.3ms
+   - Observations: Fastest, baseline diversity
+
+2. **MMR λ=0.3**
+   - Results: Precision: 0.850, Companies: 9.9/10, Categories: 3.7, Time: 48.6ms
+   - Observations: Good diversity boost, no precision loss
+
+3. **MMR λ=0.5**
+   - Results: Precision: **0.880**, Companies: 9.9/10, Categories: 3.8, Time: 48.0ms
+   - Observations: **Best balance** - highest precision AND good diversity
+
+4. **MMR λ=0.7**
+   - Results: Precision: 0.840, Companies: 9.9/10, Categories: 3.6, Time: 47.6ms
+   - Observations: Slight precision drop, similar diversity
+
+5. **MMR λ=0.9**
+   - Results: Precision: 0.850, Companies: 9.5/10, Categories: 3.5, Time: 48.1ms
+   - Observations: Converges toward cosine behavior
+
+**Metrics Used:**
+- **Precision@10**: % of top-10 results containing query keywords (relevance)
+- **Unique Companies**: Diversity of employers in results (0-10)
+- **Unique Categories**: Job category diversity (engineering, management, etc.)
+- **Embedding Speed**: Chunks per second (throughput)
+- **Search Time**: Milliseconds per query (latency)
+
+**Winners:**
+- **Embedding Model:** google/embeddinggemma-300m (Precision: 0.980)
+- **Retrieval Strategy:** MMR with λ=0.5 (Precision: 0.880, Diversity: 9.9/10)
+
+**Rationale:**
+- EmbeddingGemma achieved 98% precision (12-13% better than alternatives) due to:
+  - Asymmetric query/document encoding (optimized for retrieval)
+  - Larger model trained specifically for document retrieval
+  - 768-dim embeddings capture more semantic nuance
+- MMR λ=0.5 provided best precision (0.880) with near-maximum diversity (9.9/10)
+- Speed trade-off acceptable: 147 chunks/sec still processes 500 jobs in ~25 seconds
+
+**Key Learning:**
+1. **Specialized models win**: EmbeddingGemma designed for retrieval outperforms general-purpose embeddings
+2. **Asymmetric encoding matters**: Separate query vs document encoding improves retrieval quality
+3. **MMR improves both relevance and diversity**: λ=0.5 found optimal balance, actually increasing precision
+4. **Speed vs quality trade-off**: 10x slower than MiniLM but 15% more accurate is worthwhile for offline processing
+
+**Impact on Project:**
+- Update `embedding_generator.py` to use google/embeddinggemma-300m as default
+- Update `vector_store.py` to use MMR with λ=0.5 as default retrieval
+- Expected: Significant improvement in job recommendation quality
+
+**Next Steps:**
+- Update production code with winner configurations
+- Move to Phase 5: Resume-to-Job Matching & Ranking

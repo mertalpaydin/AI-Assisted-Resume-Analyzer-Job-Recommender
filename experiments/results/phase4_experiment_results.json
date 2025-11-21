@@ -1,0 +1,1894 @@
+{
+  "timestamp": "2025-11-21T09:32:51.600794",
+  "embedding_model_experiment": {
+    "all-MiniLM-L6-v2": {
+      "dim": 384,
+      "model_load_time": 5.454769134521484,
+      "embed_time": 2.4355032444000244,
+      "chunks_per_sec": 1489.2199418496343,
+      "memory_mb": 5.31298828125,
+      "avg_precision": 0.85,
+      "avg_diversity": 9.5,
+      "query_details": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.6,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Research Assistant",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant"
+          ],
+          "top_score": 0.4036444425582886,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 1,
+              "other": 7,
+              "management": 1,
+              "design": 1
+            }
+          }
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "top_score": 0.4683017432689667,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 7,
+              "other": 2,
+              "management": 1
+            }
+          }
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.6,
+          "top_5_titles": [
+            "Product Manager",
+            "Warehouse Pro - FedEx Ground",
+            "Motion Graphics Artist/Video Editor",
+            "Interior Designer",
+            "UX Designer II"
+          ],
+          "top_score": 0.3264472186565399,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 6,
+              "design": 2
+            }
+          }
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "Manager - Project Management",
+            "Project Manager"
+          ],
+          "top_score": 0.5144221782684326,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "management": 6,
+              "analytics": 3,
+              "other": 1
+            }
+          }
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Program Manager",
+            "Payroll Manager",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)"
+          ],
+          "top_score": 0.4177957773208618,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 4,
+              "other": 4,
+              "analytics": 1
+            }
+          }
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product Manager [Manhattan S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Program Manager"
+          ],
+          "top_score": 0.6062368154525757,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "other": 1,
+              "design": 2,
+              "analytics": 1
+            }
+          }
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.9,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Designer",
+            "Graphic Design Consultant"
+          ],
+          "top_score": 0.588998556137085,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 8,
+              "other": 1,
+              "management": 1
+            }
+          }
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "Quality Lab Technician",
+            "IT Program Manager"
+          ],
+          "top_score": 0.409263551235199,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "other": 7,
+              "management": 1
+            }
+          }
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Principal Project Accounting Leader",
+            "Principal Project Accounting Leader (Partially Work From Home)",
+            "Research Scientist, Molecular Biology"
+          ],
+          "top_score": 0.4796362519264221,
+          "diversity": {
+            "unique_companies": 8,
+            "unique_categories": 4,
+            "company_entropy": 1.9730014055936125,
+            "category_distribution": {
+              "other": 4,
+              "sales": 3,
+              "analytics": 2,
+              "design": 1
+            }
+          }
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Entry Level Data Analyst",
+            "Field Risk Specialist/Floorplan Auditor"
+          ],
+          "top_score": 0.466952383518219,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 2,
+              "other": 5,
+              "analytics": 1
+            }
+          }
+        }
+      ]
+    },
+    "all-mpnet-base-v2": {
+      "dim": 768,
+      "model_load_time": 3.0689849853515625,
+      "embed_time": 14.969061136245728,
+      "chunks_per_sec": 242.2997652950771,
+      "memory_mb": 10.6259765625,
+      "avg_precision": 0.86,
+      "avg_diversity": 9.6,
+      "query_details": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.8,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Project Manager",
+            "Data Scientist",
+            "Production Designer",
+            "Payroll Manager"
+          ],
+          "top_score": 0.43098679184913635,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "management": 5,
+              "design": 2,
+              "other": 1
+            }
+          }
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Sr Data Scientist",
+            "Associate Data Scientist",
+            "Data Analyst"
+          ],
+          "top_score": 0.5290487408638,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 2,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 8,
+              "other": 2
+            }
+          }
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Product Manager",
+            "Night Auditor",
+            "Product Designer - Banking",
+            "Motion Graphics Artist/Video Editor",
+            "Product Manager"
+          ],
+          "top_score": 0.3764401078224182,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 3,
+              "design": 4,
+              "sales": 1
+            }
+          }
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "IT Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "PLM Project Manager",
+            "Research Associate, II"
+          ],
+          "top_score": 0.540993332862854,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820567,
+            "category_distribution": {
+              "management": 7,
+              "other": 1,
+              "analytics": 2
+            }
+          }
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Program Manager",
+            "Product Designer (UX)",
+            "Manager - Project Management",
+            "Specifications Writer",
+            "Client Partner - BFS"
+          ],
+          "top_score": 0.41422098875045776,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "design": 1,
+              "other": 3
+            }
+          }
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager",
+            "Senior UX Designer",
+            "Data Coordinator, Data Research and Analysis",
+            "PLM Project Manager",
+            "Program Manager"
+          ],
+          "top_score": 0.5718078017234802,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "design": 1,
+              "other": 1,
+              "analytics": 2
+            }
+          }
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.7,
+          "top_5_titles": [
+            "UX/UI Designer",
+            "D UI / UX Designer",
+            "Graphic Designer Senior",
+            "Associate Art Director - Concept - Unannounced Survival Game",
+            "Product Designer - Banking"
+          ],
+          "top_score": 0.5365422964096069,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 7,
+              "management": 1,
+              "other": 2
+            }
+          }
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "PLM Project Manager",
+            "Payroll Administrator",
+            "Data Analyst",
+            "Data Analyst",
+            "Data Analyst"
+          ],
+          "top_score": 0.28040629625320435,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 3,
+              "analytics": 4,
+              "sales": 1
+            }
+          }
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Analyst",
+            "IT Program Manager",
+            "Fixed Asset Accounting Leader",
+            "Principal Project Accounting Leader",
+            "Principal Project Accounting Leader (Partially Work From Home)"
+          ],
+          "top_score": 0.5111634731292725,
+          "diversity": {
+            "unique_companies": 8,
+            "unique_categories": 4,
+            "company_entropy": 1.9730014055936125,
+            "category_distribution": {
+              "analytics": 1,
+              "management": 2,
+              "sales": 3,
+              "other": 4
+            }
+          }
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Executive Creative Director (Agency)",
+            "Digital Creative Director + Branding Enthusiast",
+            "Manager - Project Management",
+            "UX Designer II",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)"
+          ],
+          "top_score": 0.4212193489074707,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820567,
+            "category_distribution": {
+              "management": 4,
+              "design": 3,
+              "other": 2,
+              "analytics": 1
+            }
+          }
+        }
+      ]
+    },
+    "google/embeddinggemma-300m": {
+      "dim": 768,
+      "model_load_time": 5.483355522155762,
+      "embed_time": 24.59843873977661,
+      "chunks_per_sec": 147.44838232903794,
+      "memory_mb": 10.6259765625,
+      "avg_precision": 0.9800000000000001,
+      "avg_diversity": 9.7,
+      "query_details": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Product Manager",
+            "Associate Product Manager",
+            "Technical Product Manager",
+            "Fixed Asset Accounting Leader"
+          ],
+          "top_score": 0.44862687587738037,
+          "diversity": {
+            "unique_companies": 8,
+            "unique_categories": 4,
+            "company_entropy": 1.973001405593613,
+            "category_distribution": {
+              "analytics": 2,
+              "management": 4,
+              "sales": 3,
+              "design": 1
+            }
+          }
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Sr Data Scientist",
+            "Associate Data Scientist",
+            "SCIENTIST (I, II, or III)",
+            "Quantitative Analyst"
+          ],
+          "top_score": 0.4446878433227539,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 8,
+              "management": 1,
+              "other": 1
+            }
+          }
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Manager",
+            "Graphic Designer",
+            "Associate Product Manager",
+            "Junior Business Analyst",
+            "Creative Director"
+          ],
+          "top_score": 0.4573836028575897,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 4,
+              "design": 3,
+              "analytics": 2,
+              "other": 1
+            }
+          }
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "IT Program Manager",
+            "Manager - Project Management",
+            "PLM Project Manager",
+            "Project Manager",
+            "IT Project Manager"
+          ],
+          "top_score": 0.48834434151649475,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 2,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 9,
+              "other": 1
+            }
+          }
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Product Designer (UX)",
+            "Associate Product Manager",
+            "Product Manager",
+            "Product Manager"
+          ],
+          "top_score": 0.4293929934501648,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 3,
+              "design": 1,
+              "management": 5,
+              "sales": 1
+            }
+          }
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager [Manhattan S",
+            "Product Manager S",
+            "Data Coordinator, Data Research and Analysis",
+            "PLM Project Manager",
+            "D UI / UX Designer"
+          ],
+          "top_score": 0.49451643228530884,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 7,
+              "other": 2,
+              "design": 1
+            }
+          }
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 1.0,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "UX Designer II",
+            "UX/UI Designer",
+            "User Experience Designer IV",
+            "Associate Product Manager"
+          ],
+          "top_score": 0.5425750017166138,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 2,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 8,
+              "management": 2
+            }
+          }
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Analyst",
+            "Payroll Administrator",
+            "Entry Level Business Analyst/Jr Data Analyst",
+            "Grant and Contract Administrator",
+            "Data Analyst"
+          ],
+          "top_score": 0.33920323848724365,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 4,
+              "other": 4,
+              "management": 2
+            }
+          }
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Analyst",
+            "Internal Audit Analyst - Minnetonka, MN",
+            "UX/UI Designer",
+            "Clinical Research Coordinator",
+            "Quality Auditor"
+          ],
+          "top_score": 0.42249929904937744,
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "design": 1,
+              "other": 6,
+              "management": 1
+            }
+          }
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Graphic Designer",
+            "Graphic Designer",
+            "Entry Level Data Analyst",
+            "Production Designer",
+            "Digital Creative Director + Branding Enthusiast"
+          ],
+          "top_score": 0.4602230191230774,
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 3,
+              "analytics": 1,
+              "management": 4,
+              "other": 2
+            }
+          }
+        }
+      ]
+    }
+  },
+  "retrieval_strategy_experiment": {
+    "cosine": {
+      "use_mmr": false,
+      "lambda": 0.0,
+      "avg_precision": 0.85,
+      "avg_unique_companies": 9.5,
+      "avg_unique_categories": 3.5,
+      "avg_search_time": 0.00032243728637695315,
+      "query_results": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.6,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Research Assistant",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 1,
+              "other": 7,
+              "management": 1,
+              "design": 1
+            }
+          },
+          "search_time": 0.0004951953887939453
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 7,
+              "other": 2,
+              "management": 1
+            }
+          },
+          "search_time": 0.0003638267517089844
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.6,
+          "top_5_titles": [
+            "Product Manager",
+            "Warehouse Pro - FedEx Ground",
+            "Motion Graphics Artist/Video Editor",
+            "Interior Designer",
+            "UX Designer II"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 6,
+              "design": 2
+            }
+          },
+          "search_time": 0.00023984909057617188
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "Manager - Project Management",
+            "Project Manager"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "management": 6,
+              "analytics": 3,
+              "other": 1
+            }
+          },
+          "search_time": 0.00024175643920898438
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Program Manager",
+            "Payroll Manager",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 4,
+              "other": 4,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.0002532005310058594
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product Manager [Manhattan S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "other": 1,
+              "design": 2,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.00023245811462402344
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.9,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Designer",
+            "Graphic Design Consultant"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 8,
+              "other": 1,
+              "management": 1
+            }
+          },
+          "search_time": 0.00023174285888671875
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "Quality Lab Technician",
+            "IT Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "other": 7,
+              "management": 1
+            }
+          },
+          "search_time": 0.0004189014434814453
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Principal Project Accounting Leader",
+            "Principal Project Accounting Leader (Partially Work From Home)",
+            "Research Scientist, Molecular Biology"
+          ],
+          "diversity": {
+            "unique_companies": 8,
+            "unique_categories": 4,
+            "company_entropy": 1.9730014055936125,
+            "category_distribution": {
+              "other": 4,
+              "sales": 3,
+              "analytics": 2,
+              "design": 1
+            }
+          },
+          "search_time": 0.0003783702850341797
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Entry Level Data Analyst",
+            "Field Risk Specialist/Floorplan Auditor"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 2,
+              "other": 5,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.00036907196044921875
+        }
+      ]
+    },
+    "mmr_0.3": {
+      "use_mmr": true,
+      "lambda": 0.3,
+      "avg_precision": 0.85,
+      "avg_unique_companies": 9.9,
+      "avg_unique_categories": 3.7,
+      "avg_search_time": 0.04864888191223145,
+      "query_results": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.9,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant",
+            "Senior UX Designer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 5,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 1,
+              "management": 2,
+              "other": 5,
+              "design": 1,
+              "sales": 1
+            }
+          },
+          "search_time": 0.049696922302246094
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 6,
+              "other": 1,
+              "management": 3
+            }
+          },
+          "search_time": 0.05099821090698242
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Product Manager",
+            "Warehouse Pro - FedEx Ground",
+            "Motion Graphics Artist/Video Editor",
+            "Cash Office Teammate - Price Chopper",
+            "Interior Designer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 7,
+              "design": 1
+            }
+          },
+          "search_time": 0.04820847511291504
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Manager - Project Management",
+            "IT Project Manager",
+            "Research Associate, II",
+            "Sr. Business Analyst - Quote to Cash"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 5,
+              "other": 3,
+              "analytics": 1,
+              "sales": 1
+            }
+          },
+          "search_time": 0.04874753952026367
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)",
+            "System Test Lab Technician",
+            "Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 3,
+              "other": 4,
+              "analytics": 2
+            }
+          },
+          "search_time": 0.04810690879821777
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Senior UX Designer",
+            "Sr. Business Analyst - Quote to Cash"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 3,
+              "other": 3,
+              "design": 1,
+              "analytics": 3
+            }
+          },
+          "search_time": 0.04871511459350586
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.7,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Design Consultant",
+            "WEB AND GRAPHIC DESIGNER"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 6,
+              "other": 3,
+              "management": 1
+            }
+          },
+          "search_time": 0.04742264747619629
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "Payroll Specialist (Norwalk)",
+            "Controller - Davenport Iowa area 4 plants"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 3,
+              "other": 6,
+              "sales": 1
+            }
+          },
+          "search_time": 0.04874992370605469
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Research Scientist, Molecular Biology",
+            "Assistant Chemist",
+            "Research Assistant"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "other": 7,
+              "sales": 1,
+              "analytics": 1,
+              "management": 1
+            }
+          },
+          "search_time": 0.047330617904663086
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.5,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Field Risk Specialist/Floorplan Auditor",
+            "Data Coordinator, Data Research and Analysis"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 1,
+              "other": 6,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.04851245880126953
+        }
+      ]
+    },
+    "mmr_0.5": {
+      "use_mmr": true,
+      "lambda": 0.5,
+      "avg_precision": 0.8799999999999999,
+      "avg_unique_companies": 9.9,
+      "avg_unique_categories": 3.8,
+      "avg_search_time": 0.04795892238616943,
+      "query_results": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.9,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant",
+            "Senior UX Designer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 5,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "management": 2,
+              "other": 4,
+              "design": 1,
+              "sales": 1
+            }
+          },
+          "search_time": 0.04777073860168457
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 7,
+              "other": 1,
+              "management": 2
+            }
+          },
+          "search_time": 0.04682517051696777
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Product Manager",
+            "Motion Graphics Artist/Video Editor",
+            "Cash Office Teammate - Price Chopper",
+            "Interior Designer",
+            "Associate Product Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 5,
+              "design": 1,
+              "analytics": 2
+            }
+          },
+          "search_time": 0.04812216758728027
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "Manager - Project Management",
+            "Project Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 7,
+              "analytics": 2,
+              "other": 1
+            }
+          },
+          "search_time": 0.04835939407348633
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Program Manager",
+            "Payroll Manager",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 4,
+              "other": 3,
+              "analytics": 2
+            }
+          },
+          "search_time": 0.04877829551696777
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Program Manager",
+            "Product Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 5,
+              "other": 2,
+              "design": 2,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.04873490333557129
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.8,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Design Consultant",
+            "UX/UI Designer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 7,
+              "other": 2,
+              "management": 1
+            }
+          },
+          "search_time": 0.04758763313293457
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "IT Program Manager",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 4,
+              "other": 4,
+              "management": 1,
+              "sales": 1
+            }
+          },
+          "search_time": 0.04816770553588867
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Research Scientist, Molecular Biology",
+            "Assistant Chemist",
+            "Specifications Writer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "other": 6,
+              "sales": 1,
+              "analytics": 2,
+              "management": 1
+            }
+          },
+          "search_time": 0.04779815673828125
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.6,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Entry Level Data Analyst",
+            "Field Risk Specialist/Floorplan Auditor"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 1,
+              "other": 5,
+              "analytics": 2
+            }
+          },
+          "search_time": 0.047445058822631836
+        }
+      ]
+    },
+    "mmr_0.7": {
+      "use_mmr": true,
+      "lambda": 0.7,
+      "avg_precision": 0.8400000000000001,
+      "avg_unique_companies": 9.9,
+      "avg_unique_categories": 3.6,
+      "avg_search_time": 0.047626614570617676,
+      "query_results": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.7,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Research Assistant",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 1,
+              "other": 6,
+              "management": 2,
+              "design": 1
+            }
+          },
+          "search_time": 0.047149658203125
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 6,
+              "other": 3,
+              "management": 1
+            }
+          },
+          "search_time": 0.04784679412841797
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.6,
+          "top_5_titles": [
+            "Product Manager",
+            "Warehouse Pro - FedEx Ground",
+            "Motion Graphics Artist/Video Editor",
+            "Interior Designer",
+            "UX Designer II"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 6,
+              "design": 2
+            }
+          },
+          "search_time": 0.04786086082458496
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "Manager - Project Management",
+            "Project Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 7,
+              "analytics": 2,
+              "other": 1
+            }
+          },
+          "search_time": 0.04769778251647949
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Program Manager",
+            "Payroll Manager",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 4,
+              "other": 3,
+              "analytics": 2
+            }
+          },
+          "search_time": 0.04741072654724121
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product Manager [Manhattan S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "other": 1,
+              "design": 2,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.046472787857055664
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.8,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Design Consultant",
+            "UX/UI Designer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 7,
+              "other": 2,
+              "management": 1
+            }
+          },
+          "search_time": 0.04763078689575195
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "Quality Lab Technician",
+            "IT Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "other": 7,
+              "management": 1
+            }
+          },
+          "search_time": 0.047789573669433594
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Research Scientist, Molecular Biology",
+            "Assistant Chemist",
+            "Specifications Writer"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 5,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "other": 5,
+              "sales": 1,
+              "analytics": 2,
+              "design": 1,
+              "management": 1
+            }
+          },
+          "search_time": 0.049283742904663086
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Entry Level Data Analyst",
+            "Field Risk Specialist/Floorplan Auditor"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 2,
+              "other": 5,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.04712343215942383
+        }
+      ]
+    },
+    "mmr_0.9": {
+      "use_mmr": true,
+      "lambda": 0.9,
+      "avg_precision": 0.85,
+      "avg_unique_companies": 9.5,
+      "avg_unique_categories": 3.5,
+      "avg_search_time": 0.048080825805664064,
+      "query_results": [
+        {
+          "query": "Senior Software Engineer Python backend APIs REST",
+          "precision": 0.6,
+          "top_5_titles": [
+            "SCIENTIST (I, II, or III)",
+            "Research Assistant",
+            "Art Director",
+            "Library Assistant",
+            "Chemistry, Postdoctoral Research Assistant"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 1,
+              "other": 7,
+              "management": 1,
+              "design": 1
+            }
+          },
+          "search_time": 0.04815173149108887
+        },
+        {
+          "query": "Data Scientist machine learning TensorFlow deep learning NLP",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Data Scientist",
+            "Social Media Evaluator - Dynamic Work Opportunity (Mc Kees Rocks)",
+            "Associate Data Scientist",
+            "Sr Data Scientist",
+            "Data Analyst"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 7,
+              "other": 2,
+              "management": 1
+            }
+          },
+          "search_time": 0.047736167907714844
+        },
+        {
+          "query": "Full stack developer React Node.js JavaScript frontend",
+          "precision": 0.6,
+          "top_5_titles": [
+            "Product Manager",
+            "Warehouse Pro - FedEx Ground",
+            "Motion Graphics Artist/Video Editor",
+            "Interior Designer",
+            "UX Designer II"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 2,
+              "other": 6,
+              "design": 2
+            }
+          },
+          "search_time": 0.0488741397857666
+        },
+        {
+          "query": "Project Manager Agile Scrum team leadership",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Program Manager",
+            "Project Manager",
+            "Program Manager, EPMO",
+            "Manager - Project Management",
+            "Project Manager"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "management": 6,
+              "analytics": 3,
+              "other": 1
+            }
+          },
+          "search_time": 0.047075510025024414
+        },
+        {
+          "query": "DevOps Engineer Kubernetes Docker CI/CD cloud AWS",
+          "precision": 0.9,
+          "top_5_titles": [
+            "Product Designer (UX)",
+            "Program Manager",
+            "Payroll Manager",
+            "Product Manager",
+            "Product Solutions Manager (naviHealth)"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "design": 1,
+              "management": 4,
+              "other": 4,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.0483088493347168
+        },
+        {
+          "query": "Product Manager roadmap stakeholder user research",
+          "precision": 1.0,
+          "top_5_titles": [
+            "Product Manager S",
+            "Product Manager [Manhattan S",
+            "Product manager",
+            "Data Coordinator, Data Research and Analysis",
+            "Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 4,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "management": 6,
+              "other": 1,
+              "design": 2,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.048779964447021484
+        },
+        {
+          "query": "UX Designer user experience wireframes Figma prototyping",
+          "precision": 0.9,
+          "top_5_titles": [
+            "D UI / UX Designer",
+            "Product Designer (UX)",
+            "Graphic Designer",
+            "Graphic Designer",
+            "Graphic Design Consultant"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 3,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 8,
+              "other": 1,
+              "management": 1
+            }
+          },
+          "search_time": 0.04755091667175293
+        },
+        {
+          "query": "Database Administrator SQL PostgreSQL Oracle performance",
+          "precision": 0.8,
+          "top_5_titles": [
+            "Business Analyst",
+            "Payroll Clerk",
+            "Grant and Contract Administrator",
+            "Quality Lab Technician",
+            "IT Program Manager"
+          ],
+          "diversity": {
+            "unique_companies": 10,
+            "unique_categories": 3,
+            "company_entropy": 2.3025850919940454,
+            "category_distribution": {
+              "analytics": 2,
+              "other": 7,
+              "management": 1
+            }
+          },
+          "search_time": 0.04846310615539551
+        },
+        {
+          "query": "Security Engineer penetration testing cybersecurity compliance",
+          "precision": 1.0,
+          "top_5_titles": [
+            "System Test Lab Technician",
+            "Fixed Asset Accounting Leader",
+            "Principal Project Accounting Leader",
+            "Principal Project Accounting Leader (Partially Work From Home)",
+            "Research Scientist, Molecular Biology"
+          ],
+          "diversity": {
+            "unique_companies": 8,
+            "unique_categories": 4,
+            "company_entropy": 1.9730014055936125,
+            "category_distribution": {
+              "other": 4,
+              "sales": 3,
+              "analytics": 2,
+              "design": 1
+            }
+          },
+          "search_time": 0.047983407974243164
+        },
+        {
+          "query": "Marketing Manager digital campaigns analytics SEO",
+          "precision": 0.7,
+          "top_5_titles": [
+            "Production Designer",
+            "Art Director",
+            "Audio and Video Transcription - Flexible Schedules (Lansing)",
+            "Entry Level Data Analyst",
+            "Field Risk Specialist/Floorplan Auditor"
+          ],
+          "diversity": {
+            "unique_companies": 9,
+            "unique_categories": 4,
+            "company_entropy": 2.1639556559820563,
+            "category_distribution": {
+              "design": 2,
+              "management": 2,
+              "other": 5,
+              "analytics": 1
+            }
+          },
+          "search_time": 0.047884464263916016
+        }
+      ]
+    }
+  }
+}

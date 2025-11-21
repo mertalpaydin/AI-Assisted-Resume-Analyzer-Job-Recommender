@@ -254,6 +254,54 @@ RAKE was selected based on overwhelming experimental evidence:
 
 ---
 
+### Decision #4: Use EmbeddingGemma + MMR λ=0.5 for Job Search
+**Date:** 2025-11-21
+**Phase:** Phase 4 - Embedding Generation & Vector Storage
+**Status:** Accepted
+
+**Context:**
+Need to select embedding model and retrieval strategy for semantic job search. Tested 3 embedding models (all-MiniLM-L6-v2, all-mpnet-base-v2, google/embeddinggemma-300m) on 500 jobs (3627 chunks) with 10 diverse test queries. Also compared cosine similarity vs MMR with lambda values 0.3-0.9.
+
+**Decision:**
+Use **google/embeddinggemma-300m** for embeddings with **MMR λ=0.5** for retrieval.
+
+**Alternatives Considered:**
+1. **all-MiniLM-L6-v2**
+   - Pros: Fastest (1489 chunks/sec), smallest memory (5.31 MB), 384-dim embeddings
+   - Cons: Lower precision (85.0%), general-purpose model not optimized for retrieval
+
+2. **all-mpnet-base-v2**
+   - Pros: Higher quality than MiniLM, 768-dim embeddings
+   - Cons: Only 1% precision improvement (86.0%) but 6x slower (242 chunks/sec)
+
+3. **google/embeddinggemma-300m**
+   - Pros: **Best precision (98.0%)**, asymmetric query/doc encoding, retrieval-optimized
+   - Cons: Slowest (147 chunks/sec), requires sentence-transformers encode_query/encode_document
+
+**Rationale:**
+EmbeddingGemma + MMR λ=0.5 was selected because:
+- **12-13% precision improvement**: 98% vs 85-86% for alternatives
+- **Retrieval-optimized**: Asymmetric encoding (encode_query vs encode_document) is designed for search
+- **MMR λ=0.5 optimal**: Highest precision (88%) AND near-maximum diversity (9.9/10)
+- **Acceptable speed**: 147 chunks/sec processes 500 jobs in ~25 seconds (batch processing)
+
+**Trade-offs:**
+- Speed vs Quality: Accept 10x slower embedding for 15% precision gain
+- Complexity vs Performance: Require separate query/document encoding methods
+- Memory vs Quality: 768-dim embeddings use 2x memory but significantly better quality
+
+**Consequences:**
+- Positive: Significantly improved job recommendation relevance, better result diversity
+- Negative: Slower embedding generation, requires model download (~1GB)
+- Risks: May need optimization for very large job databases (>10K jobs)
+
+**Related Decisions:**
+- Experiment #4: Embedding Model & Retrieval Strategy Comparison (logs/experiment_log.md)
+
+**Review Date:** After Phase 5 - evaluate end-to-end matching quality with real resumes
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
@@ -261,6 +309,7 @@ RAKE was selected based on overwhelming experimental evidence:
 | 1 | Select gemma3:4b as Primary LLM for Resume Parsing | 2 | Accepted | 2025-11-18 | High |
 | 2 | Implement Dual-Parser Sequential Pipeline for PDF Extraction | 2 | Accepted | 2025-11-20 | High |
 | 3 | Use RAKE as Primary Skill Extraction Method | 3 | Accepted | 2025-11-20 | High |
+| 4 | Use EmbeddingGemma + MMR λ=0.5 for Job Search | 4 | Accepted | 2025-11-21 | High |
 
 
 ---
@@ -277,9 +326,9 @@ RAKE was selected based on overwhelming experimental evidence:
 - [x] ~~Skill extraction approach (KeyBERT vs alternatives)~~ - COMPLETED: RAKE (Decision #3)
 
 ### Phase 4
-- [ ] Embedding model selection (after Experiment 4.1)
-- [ ] FAISS index type (after Experiment 4.3)
-- [ ] MMR lambda parameter (after Experiment 4.4)
+- [x] ~~Embedding model selection (after Experiment 4.1)~~ - COMPLETED: google/embeddinggemma-300m (Decision #4)
+- [x] ~~FAISS index type~~ - COMPLETED: Using IndexFlatIP (inner product for cosine similarity)
+- [x] ~~MMR lambda parameter (after Experiment 4.4)~~ - COMPLETED: λ=0.5 (Decision #4)
 
 ### Phase 5
 - [ ] Ranking strategy (after Experiment 5.1)

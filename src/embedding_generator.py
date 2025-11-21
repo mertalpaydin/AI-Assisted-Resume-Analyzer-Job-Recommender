@@ -37,12 +37,17 @@ class ChunkEmbeddingGenerator:
             'dim': 768,
             'description': 'Higher quality (110M params)',
             'type': 'sentence-transformers'
+        },
+        'google/embeddinggemma-300m': {
+            'dim': 768,
+            'description': 'Best quality for retrieval (300M params), asymmetric encoding',
+            'type': 'embeddinggemma'
         }
     }
 
     def __init__(
         self,
-        model_name: str = 'all-MiniLM-L6-v2',
+        model_name: str = 'google/embeddinggemma-300m',
         batch_size: int = 32,
         cache_dir: Optional[str] = None
     ):
@@ -81,38 +86,61 @@ class ChunkEmbeddingGenerator:
             logger.error("sentence-transformers not installed. Run: pip install sentence-transformers")
             raise
 
-    def embed_text(self, text: str) -> np.ndarray:
+    def embed_text(self, text: str, is_query: bool = True) -> np.ndarray:
         """
         Generate embedding for a single text.
 
         Args:
             text: Input text
+            is_query: If True, use query encoding (for EmbeddingGemma).
+                      If False, use document encoding.
 
         Returns:
             Embedding vector as numpy array
         """
-        embedding = self.model.encode(text, convert_to_numpy=True)
-        return embedding
+        model_info = self.AVAILABLE_MODELS.get(self.model_name, {})
 
-    def embed_texts(self, texts: List[str], show_progress: bool = True) -> np.ndarray:
+        # Use asymmetric encoding for embeddinggemma
+        if model_info.get('type') == 'embeddinggemma':
+            if is_query:
+                embedding = self.model.encode_query(text)
+            else:
+                embedding = self.model.encode_document(text)
+        else:
+            embedding = self.model.encode(text, convert_to_numpy=True)
+
+        return np.array(embedding, dtype='float32')
+
+    def embed_texts(self, texts: List[str], show_progress: bool = True, is_query: bool = False) -> np.ndarray:
         """
         Generate embeddings for multiple texts.
 
         Args:
             texts: List of input texts
             show_progress: Show progress bar
+            is_query: If True, use query encoding. Default False (document encoding).
 
         Returns:
             Array of embeddings (n_texts, embedding_dim)
         """
         start_time = time.time()
 
-        embeddings = self.model.encode(
-            texts,
-            batch_size=self.batch_size,
-            show_progress_bar=show_progress,
-            convert_to_numpy=True
-        )
+        model_info = self.AVAILABLE_MODELS.get(self.model_name, {})
+
+        # Use asymmetric encoding for embeddinggemma
+        if model_info.get('type') == 'embeddinggemma':
+            if is_query:
+                embeddings = self.model.encode_query(texts, show_progress_bar=show_progress)
+            else:
+                embeddings = self.model.encode_document(texts, show_progress_bar=show_progress)
+            embeddings = np.array(embeddings, dtype='float32')
+        else:
+            embeddings = self.model.encode(
+                texts,
+                batch_size=self.batch_size,
+                show_progress_bar=show_progress,
+                convert_to_numpy=True
+            )
 
         elapsed = time.time() - start_time
         logger.info(f"Embedded {len(texts)} texts in {elapsed:.2f}s ({len(texts)/elapsed:.1f} texts/sec)")

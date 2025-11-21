@@ -350,9 +350,78 @@ Stores complete processing results:
 
 ## Phase 4: Embedding Generation & Vector Storage
 
-**Status:** Not Started
+**Start Date:** 2025-11-21
+**End Date:** 2025-11-21
+**Status:** Completed
 
-*(To be updated as phase progresses)*
+### Step 4.1: Job Chunking Strategy
+
+**Status:** Completed
+
+Implemented `JobChunker` class for intelligent job description chunking:
+- Chunks based on logical sections (title, requirements, description, metadata)
+- Average 7.3 chunks per job (500 jobs → 3627 chunks)
+- Preserves context within chunks for better embedding quality
+
+### Step 4.2: Embedding Model Comparison
+
+**Status:** Completed
+**Timestamp:** 2025-11-21
+
+Compared 3 embedding models on 500 jobs (3627 chunks):
+
+| Model | Precision@10 | Speed | Memory |
+|-------|--------------|-------|--------|
+| all-MiniLM-L6-v2 | 85.0% | 1489/s | 5.31 MB |
+| all-mpnet-base-v2 | 86.0% | 242/s | 10.63 MB |
+| **google/embeddinggemma-300m** | **98.0%** | 147/s | 10.63 MB |
+
+**Winner:** google/embeddinggemma-300m with 98% precision (12-13% better than alternatives)
+
+**Key Finding:** EmbeddingGemma uses asymmetric encoding (encode_query vs encode_document) which is specifically optimized for retrieval tasks.
+
+### Step 4.3: Vector Store with FAISS
+
+**Status:** Completed
+
+Implemented `ChunkVectorStore` class with FAISS:
+- IndexFlatIP for inner product (cosine similarity with normalized vectors)
+- MMR (Maximal Marginal Relevance) for diversity
+- Job deduplication to avoid multiple chunks from same job
+
+### Step 4.4: Retrieval Strategy Comparison
+
+**Status:** Completed
+
+Compared cosine similarity vs MMR with various lambda values:
+
+| Strategy | Precision | Companies | Categories | Time |
+|----------|-----------|-----------|------------|------|
+| cosine | 0.850 | 9.5/10 | 3.5 | 0.3ms |
+| mmr_0.3 | 0.850 | 9.9/10 | 3.7 | 48.6ms |
+| **mmr_0.5** | **0.880** | 9.9/10 | 3.8 | 48.0ms |
+| mmr_0.7 | 0.840 | 9.9/10 | 3.6 | 47.6ms |
+| mmr_0.9 | 0.850 | 9.5/10 | 3.5 | 48.1ms |
+
+**Winner:** MMR with λ=0.5 - highest precision (0.880) with excellent diversity (9.9/10)
+
+**Key Learning:** MMR λ=0.5 actually improved precision (not just diversity), likely because it reduces redundant results and surfaces more relevant diverse options.
+
+### Phase 4 Summary
+
+**Final Configuration:**
+- **Embedding Model:** google/embeddinggemma-300m (sentence-transformers)
+- **Vector Store:** FAISS IndexFlatIP
+- **Retrieval:** MMR with λ=0.5
+- **Embedding Dimension:** 768
+
+**Performance Metrics:**
+- 500 jobs → 3627 chunks in ~25 seconds
+- Search latency: ~48ms per query
+- Precision@10: 98% (embedding) / 88% (retrieval with MMR)
+- Diversity: 9.9/10 unique companies
+
+**Next:** Phase 5 - Resume-to-Job Matching & Ranking
 
 ---
 
