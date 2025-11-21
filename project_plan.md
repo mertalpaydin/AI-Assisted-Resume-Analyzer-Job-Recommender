@@ -298,12 +298,20 @@
   - [x] MMR λ=0.7: Precision 0.840, Companies 9.9/10
   - [x] MMR λ=0.9: Precision 0.850, Companies 9.5/10
 
+### Step 4.6: Embedding Generation Script ✓ COMPLETED
+- [x] Create `src/generate_job_embeddings.py`:
+  - [x] Load jobs from JSONL data file
+  - [x] Chunk jobs using JobChunker
+  - [x] Generate embeddings with EmbeddingGemma
+  - [x] Build FAISS vector store
+  - [x] Save all artifacts to `data/embeddings/`
+  - [x] Command line interface with `--limit` option
+
 **Phase 4 Summary:**
 - **Embedding Model:** google/embeddinggemma-300m (98% precision)
 - **Retrieval:** MMR with λ=0.5 (88% precision, 9.9/10 diversity)
 - **Vector Store:** FAISS IndexFlatIP, 768-dim embeddings
-
-todo: generate embeddings for the job ad data with the winner embedding model
+- **Script:** `python src/generate_job_embeddings.py --limit N`
 ---
 
 ## Phase 5: Resume-to-Job Matching & Ranking

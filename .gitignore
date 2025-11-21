@@ -208,3 +208,6 @@ data/techmap-jobs_us_2023-05-05.json
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Embeddings data (generated, large files)
+data/embeddings/
