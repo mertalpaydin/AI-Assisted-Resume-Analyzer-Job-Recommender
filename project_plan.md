@@ -380,38 +380,9 @@
 
 ---
 
-## Phase 6: Stretch Goal – CV Improvement Suggestions
+## Phase 6: Streamlit UI
 
-### Step 6.1: Build LLM-Powered CV Improvement Module
-- [ ] Create `cv_improvemer.py`:
-  - [ ] Analyze resume against top matching job postings
-  - [ ] Generate suggestions for:
-    - [ ] Missing skills to develop
-    - [ ] How to better highlight existing skills
-    - [ ] Experience descriptions to improve
-    - [ ] Keywords to include for ATS optimization
-
-- [ ] **Experiment Log:** Test different suggestion generation strategies:
-  - [ ] Different LLMs (Ollama models)
-  - [ ] Try Gemini API calls, compare accuracy and latency vs Ollama models
-  - [ ] Prompt engineering variations
-  - [ ] Few-shot examples
-  - [ ] Chain-of-thought reasoning
-
-### Step 6.2: Create Actionable Recommendations
-- [ ] Structure suggestions as:
-  - [ ] High-priority (critical skill gaps)
-  - [ ] Medium-priority (nice-to-have skills)
-  - [ ] Low-priority (optional improvements)
-  - [ ] Concrete action items with resources/links
-
-- [ ] **Learning Log:** Document quality and practicality of suggestions
-
----
-
-## Phase 7: Stretch Goal – Streamlit UI
-
-### Step 7.1: Design Streamlit Application Layout
+### Step 6.1: Design Streamlit Application Layout
 - [ ] Create `app.py`:
   - [ ] File upload component for PDF resumes
   - [ ] Processing status indicator
@@ -420,34 +391,35 @@
     - [ ] Top job matches table/cards
     - [ ] Skill match breakdown (bar chart)
     - [ ] Skill gap visualization
-    - [ ] CV improvement suggestions
+    - [ ] AI-generated match insights (placeholder for Phase 7)
 
-### Step 7.2: Implement Resume Upload & Processing
+### Step 6.2: Implement Resume Upload & Processing
 - [ ] Handle file uploads:
   - [ ] Validate PDF format and size
   - [ ] Show processing progress
   - [ ] Handle errors gracefully
-  
+
 - [ ] Display parsing results:
   - [ ] Show extracted resume data
   - [ ] Allow manual corrections if needed
   - [ ] Confirm before proceeding to matching
 
-### Step 7.3: Implement Interactive Results Display
+### Step 6.3: Implement Interactive Results Display
 - [ ] Create tabs/sections for:
   - [ ] Overview dashboard
   - [ ] Detailed job matches with filtering/sorting
   - [ ] Skill analysis and gap visualization
-  - [ ] CV improvement suggestions
+  - [ ] AI insights section (placeholder)
+  - [ ] Get Detailed Insights section (placeholder)
   - [ ] Export options
 
 - [ ] Add interactivity:
-  - [ ] Filter by job category, location, salary
+  - [ ] Filter by job category, location, etc.
   - [ ] Click through for detailed job posting view
   - [ ] Copy suggestions to clipboard
-  - [ ] Bookmark/save favorites
+  - [ ] Similarity threshold slider (default 60%)
 
-### Step 7.4: Deploy & Optimize
+### Step 6.4: Deploy & Optimize
 - [ ] Optimize for performance:
   - [ ] Cache embeddings and FAISS index
   - [ ] Lazy load heavy models
@@ -456,12 +428,83 @@
 - [ ] Add configuration panel:
   - [ ] Top K results
   - [ ] Similarity threshold
-  - [ ] Model selection (LLM, embedding model)
 
 - [ ] Deploy options:
   - [ ] Local Streamlit server
-  - [ ] Streamlit Cloud deployment
-  - [ ] Docker containerization
+  - [ ] Streamlit Cloud deployment (optional)
+  - [ ] Docker containerization (optional)
+
+### Step 6.5: STRETCH GOAL – Async Streaming Results
+- [ ] Implement async job matching:
+  - [ ] Jobs appear on UI as they're identified (above threshold)
+  - [ ] Results sorted dynamically as matches stream in
+  - [ ] Progress indicator showing jobs processed / total
+
+- [ ] Parallel AI suggestion generation:
+  - [ ] Start Ollama suggestions in background for each identified job
+  - [ ] Update UI as suggestions become available
+  - [ ] Non-blocking UI during generation
+
+- [ ] Technical implementation:
+  - [ ] Use `asyncio` for concurrent processing
+  - [ ] Streamlit callback/placeholder updates
+  - [ ] Queue-based job processing
+
+---
+
+## Phase 7: AI-Generated Match Insights
+
+### Step 7.1: Design AI Insights Module
+- [ ] Create `ai_insights.py`:
+  - [ ] Analyze resume against each matched job posting
+  - [ ] Generate insights covering:
+    - [ ] Overall match quality assessment
+    - [ ] Key strengths for this specific role
+    - [ ] Potential concerns or gaps
+    - [ ] Why this candidate might be a good fit
+    - [ ] Suggested talking points for interview
+
+### Step 7.2: Implement Dual-Source AI Generation
+
+#### Source 1: Fast Ollama Insights (Always Generated)
+- [ ] Use fast local model (granite4:micro or similar)
+- [ ] Auto-generate for all matches above threshold
+- [ ] Focus on quick, factual observations:
+  - [ ] Skill overlap summary
+  - [ ] Experience relevance
+  - [ ] Key matching points
+- [ ] Target latency: <5 seconds per job
+
+#### Source 2: Gemini API Deep Insights (On-Demand)
+- [ ] Integrate Google Gemini API
+- [ ] Generate only when user clicks "Get Detailed Insights" button
+- [ ] Provide more comprehensive analysis:
+  - [ ] Detailed match reasoning
+  - [ ] Industry-specific advice
+  - [ ] Career trajectory insights
+  - [ ] Interview preparation tips
+  - [ ] Suggested resume improvements for this role
+- [ ] Handle API errors gracefully with fallback message
+
+### Step 7.3: Integrate with Streamlit UI
+- [ ] Display Ollama insights automatically:
+  - [ ] Show in expandable section per job match
+  - [ ] Loading indicator while generating
+
+- [ ] Add "Get Detailed Insights" button:
+  - [ ] Calls Gemini API on click
+  - [ ] Shows loading spinner
+  - [ ] Displays rich formatted response
+  - [ ] Cache results to avoid re-generation
+
+### Step 7.4: Experiment & Optimize
+- [ ] **Experiment Log:** Compare insight generation:
+  - [ ] Ollama models: granite4:micro vs other ollama models
+  - [ ] Prompt engineering for best insights
+
+- [ ] **Learning Log:** Document:
+  - [ ] Quality of generated insights
+  - [ ] User experience with dual-source approach
 
 ---
 
