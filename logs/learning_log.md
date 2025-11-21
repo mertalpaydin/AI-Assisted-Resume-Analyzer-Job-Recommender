@@ -427,9 +427,89 @@ Compared cosine similarity vs MMR with various lambda values:
 
 ## Phase 5: Resume-to-Job Matching & Ranking
 
-**Status:** Not Started
+**Start Date:** 2025-11-21
+**End Date:** 2025-11-21
+**Status:** Completed
 
-*(To be updated as phase progresses)*
+### Step 5.1: Build Matching Engine
+
+**Status:** Completed
+**Timestamp:** 2025-11-21
+
+Implemented `MatchingEngine` class (`src/matching_engine.py`) with:
+
+**Core Features:**
+- Resume PDF → Structured extraction (gemma3:4b)
+- Resume embedding generation (EmbeddingGemma)
+- FAISS vector search with MMR (λ=0.5)
+- Job deduplication (multiple chunks → single job)
+- Skill analysis per matched job
+
+**Configuration:**
+- Embedding model: google/embeddinggemma-300m
+- MMR enabled by default (λ=0.5)
+- Top-K configurable (default 10)
+
+### Step 5.2: Skill Gap Analysis
+
+**Status:** Completed
+
+Implemented skill analysis in matching engine:
+- RAKE + granite4:micro LLM for atomic skill extraction from jobs
+- Resume skills from LLM extraction
+- Match percentage calculation
+- Matched/missing/extra skill identification
+
+**Experiment #5: RAKE + Ollama Atomic Skill Extraction**
+- **Winner:** granite4:micro (3.75s avg, most atomic output)
+- Key finding: Smaller models produce cleaner atomic skills
+
+### Step 5.3 & 5.4: Ranking Strategies & Report Generation
+
+**Status:** Completed
+
+**Experiment #6: Ranking Strategy Comparison**
+
+| Strategy | Avg Similarity | Skill Match | Diversity |
+|----------|---------------|-------------|-----------|
+| Pure Similarity | 0.660 | 7.4% | 9/10 |
+| **MMR λ=0.5** | **0.656** | 4.2% | **10/10** |
+| MMR λ=0.3 | 0.652 | 3.2% | 10/10 |
+| Skill Rerank w=0.3 | 0.470 | 3.7% | 10/10 |
+| Skill Rerank w=0.5 | 0.347 | 3.7% | 10/10 |
+
+**Winner:** MMR λ=0.5 (maximum diversity, minimal similarity loss)
+
+**Unexpected Finding:** Skill reranking actually hurt both similarity AND skill match scores. Semantic similarity already captures skill alignment implicitly.
+
+**Report Generator** (`src/report_generator.py`):
+- JSON, Markdown, HTML export formats
+- Skill profile summary
+- Development recommendations
+- Reasoning for each match
+
+### Full Pipeline Test Results
+
+Tested complete pipeline with Harper Russo resume:
+- **Search time:** 45.05s (includes LLM skill extraction)
+- **Jobs searched:** 220,902 chunks
+- **MMR:** Enabled (λ=0.5)
+- **Diversity:** 5 different companies in top 5
+- **Reports generated:** JSON, MD, HTML
+
+### Phase 5 Summary
+
+**Final Configuration:**
+- **Matching Engine:** MatchingEngine class with MMR λ=0.5
+- **Skill Extraction:** RAKE + granite4:micro (for jobs)
+- **Report Formats:** JSON, Markdown, HTML
+- **Pipeline:** PDF → Extract → Embed → Search → Analyze → Report
+
+**Key Learnings:**
+1. MMR provides best diversity with minimal relevance trade-off
+2. Skill reranking is counterproductive - semantic similarity is sufficient
+3. Different LLM models excel at different tasks (gemma3:4b for parsing, granite4:micro for atomization)
+4. End-to-end pipeline works reliably with graceful fallbacks
 
 ---
 

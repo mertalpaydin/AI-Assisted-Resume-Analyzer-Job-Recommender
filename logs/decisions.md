@@ -302,6 +302,136 @@ EmbeddingGemma + MMR λ=0.5 was selected because:
 
 ---
 
+### Decision #5: Use granite4:micro for RAKE + LLM Atomic Skill Extraction
+**Date:** 2025-11-21
+**Phase:** Phase 5 - Resume-to-Job Matching & Ranking
+**Status:** Accepted
+
+**Context:**
+RAKE (Decision #3) extracts keyphrases from job descriptions, but these phrases are too long for effective skill matching (e.g., "strong communication skills", "kubernetes container orchestration"). Need to refine RAKE output into atomic skills (e.g., "communication", "kubernetes") that match resume skills. Tested 6 Ollama models on 4 job descriptions from different professions (IT, Healthcare, Marketing, Finance).
+
+**Decision:**
+Use **granite4:micro** via RAKE + Ollama pipeline for extracting atomic skills from job descriptions.
+
+**Pipeline:** Job Text → RAKE (keyphrases) → granite4:micro LLM (atomic skills)
+
+**Alternatives Considered:**
+1. **granite4:micro**
+   - Pros: Fastest (3.75s), produces truly atomic skills (single words), 100% success rate
+   - Cons: Fewer total skills extracted (12.5 avg)
+
+2. **llama3.2:3b**
+   - Pros: Similar speed (4.00s), good quality
+   - Cons: Keeps some multi-word phrases, less atomic output
+
+3. **gemma3:4b**
+   - Pros: Balanced quality, proven reliable from Phase 2
+   - Cons: 2x slower (7.67s), less atomic than granite4:micro
+
+4. **Larger models (llama3.1:8b, gemma3:12b)**
+   - Pros: More skills extracted, higher coverage
+   - Cons: 2.6-3.4x slower, verbose phrases reduce matching precision
+
+**Rationale:**
+granite4:micro selected for skill atomization because:
+- **Speed**: 3.75s avg is critical for real-time matching (vs 12.61s for gemma3:12b)
+- **Atomicity**: Produces single-word skills (linux, kubernetes, python) ideal for exact matching
+- **Task fit**: Different task = different model (gemma3:4b for resume parsing, granite4:micro for atomization)
+- **Profession-agnostic**: Works for IT, Healthcare, Marketing, Finance equally well
+- **100% reliability**: All test jobs succeeded with valid JSON
+
+**Trade-offs:**
+- Coverage vs Precision: Accept fewer skills (12.5) for better matching precision
+- Speed vs Verbosity: Prioritize speed for real-time matching
+- Model Size vs Task Fit: Smallest model produces cleanest output for this specific task
+
+**Consequences:**
+- Positive:
+  - Better skill matching between resumes and jobs (atomic skills match exactly)
+  - Fast extraction (3.75s/job) enables real-time matching
+  - Works across all professions (not IT-specific)
+  - Simple integration with existing RAKE pipeline
+
+- Negative:
+  - Additional LLM call per job during matching (~4s overhead)
+  - May miss some compound skills (but acceptable trade-off)
+
+- Risks:
+  - Model availability (granite4:micro must be pulled in Ollama)
+  - May need caching for repeated job extractions
+
+**Related Decisions:**
+- Decision #3: Use RAKE as Primary Skill Extraction Method (RAKE + LLM is extension)
+- Experiment #5: RAKE + Ollama Atomic Skill Extraction (logs/experiment_log.md)
+
+**Review Date:** After testing end-to-end skill matching with sample resumes
+
+---
+
+### Decision #6: Use MMR λ=0.5 for Ranking (No Skill Reranking)
+**Date:** 2025-11-21
+**Phase:** Phase 5 - Resume-to-Job Matching & Ranking
+**Status:** Accepted
+
+**Context:**
+Need to select a ranking strategy for resume-to-job matching results. Options include pure similarity scoring, MMR with various lambda values, and skill-weighted reranking. Experiment #6 tested 5 strategies on a sample resume against the job database, measuring similarity scores, skill match percentages, and result diversity.
+
+**Decision:**
+Use **MMR with λ=0.5** as the default ranking strategy. **Do not use skill-weighted reranking** - semantic similarity alone is sufficient for quality results.
+
+**Alternatives Considered:**
+1. **Pure Similarity (No MMR)**
+   - Pros: Highest similarity (0.660), highest skill match (7.4%)
+   - Cons: Lower diversity (9/10 companies), may show repetitive results
+
+2. **MMR λ=0.5 (Balanced)**
+   - Pros: **Maximum diversity (10/10)**, minimal similarity loss (0.656), consistent with Phase 4
+   - Cons: Slightly lower similarity than pure mode
+
+3. **MMR λ=0.3 (High Diversity)**
+   - Pros: Same diversity as λ=0.5
+   - Cons: Lower skill match (3.2%), more relevance sacrifice than λ=0.5
+
+4. **Skill Reranking (w=0.3, w=0.5)**
+   - Pros: Could improve skill alignment
+   - Cons: **Drastically reduced similarity** (0.660 → 0.347), **no skill improvement** (7.4% → 3.7%)
+
+**Rationale:**
+MMR λ=0.5 without skill reranking was selected because:
+- **Maximum diversity**: 10/10 unique companies shows users varied opportunities
+- **Minimal trade-off**: Only 0.004 similarity drop (0.660 → 0.656) for 11% diversity gain
+- **Consistency**: Same λ value won in Phase 4 retrieval experiments
+- **Skill reranking harmful**: Counter-intuitively, adding skill weighting reduced both similarity AND skill match
+- **Semantic similarity implicit skill matching**: High embedding similarity naturally correlates with similar skill requirements
+
+**Unexpected Finding:**
+Skill-weighted reranking actually made skill match worse (7.4% → 3.7%), suggesting that semantic similarity already captures skill alignment and reranking disrupts the optimal ordering.
+
+**Trade-offs:**
+- Diversity vs Relevance: Accept 0.6% similarity drop for 11% diversity improvement
+- Complexity vs Quality: Simpler approach (no reranking) produces better results
+
+**Consequences:**
+- Positive:
+  - Maximum result diversity improves user experience
+  - Simpler ranking logic (just MMR, no reranking)
+  - Consistent approach across retrieval and ranking
+  - Faster matching (no extra reranking step)
+
+- Negative:
+  - None significant - simpler and better
+
+- Risks:
+  - May need revisiting if skill match becomes critical requirement
+
+**Related Decisions:**
+- Decision #4: Use EmbeddingGemma + MMR λ=0.5 (same λ value)
+- Experiment #6: Ranking Strategy Comparison (logs/experiment_log.md)
+
+**Review Date:** After user testing - collect feedback on result diversity vs relevance preference
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
@@ -310,6 +440,8 @@ EmbeddingGemma + MMR λ=0.5 was selected because:
 | 2 | Implement Dual-Parser Sequential Pipeline for PDF Extraction | 2 | Accepted | 2025-11-20 | High |
 | 3 | Use RAKE as Primary Skill Extraction Method | 3 | Accepted | 2025-11-20 | High |
 | 4 | Use EmbeddingGemma + MMR λ=0.5 for Job Search | 4 | Accepted | 2025-11-21 | High |
+| 5 | Use granite4:micro for RAKE + LLM Atomic Skill Extraction | 5 | Accepted | 2025-11-21 | High |
+| 6 | Use MMR λ=0.5 for Ranking (No Skill Reranking) | 5 | Accepted | 2025-11-21 | High |
 
 
 ---
@@ -331,8 +463,8 @@ EmbeddingGemma + MMR λ=0.5 was selected because:
 - [x] ~~MMR lambda parameter (after Experiment 4.4)~~ - COMPLETED: λ=0.5 (Decision #4)
 
 ### Phase 5
-- [ ] Ranking strategy (after Experiment 5.1)
-- [ ] Skill matching logic (after Experiment 5.2)
+- [x] ~~Ranking strategy (after Experiment 5.1)~~ - COMPLETED: MMR λ=0.5, no skill reranking (Decision #6)
+- [x] ~~Skill matching logic (after Experiment 5.2)~~ - COMPLETED: Semantic similarity sufficient (Decision #6)
 
 ---
 

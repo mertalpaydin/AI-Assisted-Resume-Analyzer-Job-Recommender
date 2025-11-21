@@ -398,6 +398,95 @@ class SkillExtractor:
         logger.debug(f"Hybrid extraction: {len(sorted_skills)} unique skills")
         return sorted_skills[:n]
 
+    def extract_skills_rake_llm(
+        self,
+        text: str,
+        top_n: Optional[int] = None,
+        llm_model: str = "granite4:micro"
+    ) -> List[str]:
+        """
+        Extract atomic skills using RAKE + Ollama LLM pipeline.
+        Pipeline: Text -> RAKE (keyphrases) -> LLM (atomic skills)
+
+        Args:
+            text: Input text (resume or job description)
+            top_n: Number of keyphrases to extract from RAKE
+            llm_model: Ollama model for skill atomization (default: granite4:micro)
+
+        Returns:
+            List of atomic skills
+        """
+        import json
+        from langchain_ollama import ChatOllama
+
+        if not text or not isinstance(text, str):
+            logger.warning("Invalid input text")
+            return []
+
+        n = top_n if top_n is not None else self.top_n
+
+        try:
+            from rake_nltk import Rake
+
+            # Step 1: Extract keyphrases with RAKE
+            rake = Rake(max_length=4)
+            rake.extract_keywords_from_text(text)
+            keyphrases = rake.get_ranked_phrases()[:n]
+
+            if not keyphrases:
+                return []
+
+            # Step 2: Use LLM to extract atomic skills
+            llm = ChatOllama(model=llm_model, temperature=0.1)
+
+            prompt = f"""Extract individual, atomic skills from the following keyphrases.
+
+Rules:
+1. Return ONLY a JSON array of skill strings
+2. Each skill should be 1-3 words maximum
+3. Remove generic words like "experience", "required", "strong"
+4. Normalize to lowercase
+5. Keep technical terms, tools, certifications, and specific competencies
+6. Do NOT include job titles or years of experience
+
+Keyphrases:
+{chr(10).join(f"- {p}" for p in keyphrases)}
+
+Return ONLY a valid JSON array like: ["skill1", "skill2", "skill3"]
+
+JSON array:"""
+
+            response = llm.invoke(prompt)
+            response_text = response.content.strip()
+
+            # Parse JSON array from response
+            if '[' in response_text and ']' in response_text:
+                json_start = response_text.find('[')
+                json_end = response_text.rfind(']') + 1
+                json_text = response_text[json_start:json_end]
+                skills = json.loads(json_text)
+                skills = [str(s).lower().strip() for s in skills if s]
+
+                # Normalize skills
+                if self.use_normalization:
+                    skills = [self.normalizer.normalize(s) for s in skills]
+
+                # Deduplicate
+                skills = list(dict.fromkeys(skills))
+
+                logger.debug(f"RAKE+LLM extracted {len(skills)} atomic skills")
+                return skills
+            else:
+                logger.warning("No JSON array found in LLM response")
+                return []
+
+        except ImportError as e:
+            logger.error(f"Missing dependency: {e}")
+            return []
+        except Exception as e:
+            logger.error(f"Error in RAKE+LLM extraction: {e}")
+            return []
+
     def extract_skills_rake(
         self,
         text: str,
@@ -473,7 +562,7 @@ class SkillExtractor:
 
         Args:
             text: Input text
-            method: Extraction method ('rake' [DEFAULT], 'keybert', 'spacy', or 'hybrid')
+            method: Extraction method ('rake' [DEFAULT], 'rake_llm', 'keybert', 'spacy', or 'hybrid')
             top_n: Number of skills to extract
             return_scores: If True, return (skill, score) tuples
 
@@ -482,6 +571,11 @@ class SkillExtractor:
         """
         if method == "rake":
             return self.extract_skills_rake(text, top_n=top_n, return_scores=return_scores)
+        elif method == "rake_llm":
+            skills = self.extract_skills_rake_llm(text, top_n=top_n)
+            if return_scores:
+                return [(s, 1.0) for s in skills]
+            return skills
         elif method == "keybert":
             return self.extract_skills_keybert(text, top_n=top_n, return_scores=return_scores)
         elif method == "spacy":

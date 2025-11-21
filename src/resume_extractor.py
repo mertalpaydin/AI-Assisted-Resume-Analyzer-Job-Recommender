@@ -16,7 +16,7 @@ import time
 import re
 
 # LangChain imports
-from langchain_community.llms import Ollama
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
@@ -82,7 +82,7 @@ class ResumeExtractor:
         self.pdf_parser = PDFResumeParser(default_loader=pdf_loader)
 
         # Initialize LLM
-        self.llm = Ollama(
+        self.llm = ChatOllama(
             model=model_name,
             temperature=temperature
         )
@@ -381,7 +381,7 @@ JSON OUTPUT:
             # Parse JSON response
             try:
                 # Extract JSON from response
-                response_text = response.strip()
+                response_text = response.content.strip()
 
                 if '{' in response_text and '}' in response_text:
                     json_start = response_text.find('{')
@@ -406,7 +406,7 @@ JSON OUTPUT:
                         'metadata': {
                             'model': self.model_name,
                             'llm_time_seconds': round(llm_time, 2),
-                            'response_length': len(response),
+                            'response_length': len(response.content),
                             'skills_extracted': len(refined_resume.skills),
                             'experience_entries': len(refined_resume.experience),
                             'education_entries': len(refined_resume.education)
@@ -419,7 +419,7 @@ JSON OUTPUT:
                         'resume': None,
                         'success': False,
                         'error': error_msg,
-                        'metadata': {'llm_response': response[:200]}
+                        'metadata': {'llm_response': response.content[:200]}
                     }
 
             except json.JSONDecodeError as e:
@@ -429,7 +429,7 @@ JSON OUTPUT:
                     'resume': None,
                     'success': False,
                     'error': error_msg,
-                    'metadata': {'llm_response': response[:200]}
+                    'metadata': {'llm_response': response.content[:200]}
                 }
 
             except Exception as e:
@@ -484,7 +484,7 @@ JSON OUTPUT:
             # Parse JSON response
             try:
                 # Extract JSON from response (handle cases where LLM adds extra text)
-                response_text = response.strip()
+                response_text = response.content.strip()
 
                 if '{' in response_text and '}' in response_text:
                     json_start = response_text.find('{')
@@ -509,7 +509,7 @@ JSON OUTPUT:
                         'metadata': {
                             'model': self.model_name,
                             'llm_time_seconds': round(llm_time, 2),
-                            'response_length': len(response),
+                            'response_length': len(response.content),
                             'skills_extracted': len(resume.skills),
                             'experience_entries': len(resume.experience),
                             'education_entries': len(resume.education)
@@ -522,7 +522,7 @@ JSON OUTPUT:
                         'resume': None,
                         'success': False,
                         'error': error_msg,
-                        'metadata': {'llm_response': response[:200]}
+                        'metadata': {'llm_response': response.content[:200]}
                     }
 
             except json.JSONDecodeError as e:
@@ -532,7 +532,7 @@ JSON OUTPUT:
                     'resume': None,
                     'success': False,
                     'error': error_msg,
-                    'metadata': {'llm_response': response[:200]}
+                    'metadata': {'llm_response': response.content[:200]}
                 }
 
             except Exception as e:

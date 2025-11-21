@@ -314,73 +314,69 @@
 - **Script:** `python src/generate_job_embeddings.py --limit N`
 ---
 
-## Phase 5: Resume-to-Job Matching & Ranking
+## Phase 5: Resume-to-Job Matching & Ranking ✓ COMPLETED
 
-### Step 5.1: Build Matching Engine
-- [ ] Create `matching_engine.py`:
-  - [ ] For uploaded resume:
-    1. Parse and extract structured data
-    2. Generate embeddings
-    3. Query FAISS for similar jobs
-  
-  - [ ] Implement ranking strategies:
-    - [ ] Weighted similarity scores (job description + title + skills)
-    - [ ] Custom scoring based on experience level
-    - [ ] Recency boost for recent postings
+### Step 5.1: Build Matching Engine ✓ COMPLETED
+- [x] Create `matching_engine.py`:
+  - [x] For uploaded resume:
+    1. Parse and extract structured data (gemma3:4b)
+    2. Generate embeddings (EmbeddingGemma)
+    3. Query FAISS for similar jobs (MMR λ=0.5)
 
-- [ ] **Experiment Log:** Test different ranking strategies:
-  - [ ] Equal weighting
-  - [ ] Emphasis on skill matches
-  - [ ] Machine learning-based scoring (optional)
+  - [x] Implement ranking strategies:
+    - [x] MMR with λ=0.5 (balanced relevance/diversity) - **WINNER**
+    - [x] Pure similarity (baseline)
+    - [x] Skill-weighted reranking (tested but counterproductive)
 
-### Step 5.2: Implement Skill Gap Analysis
-- [ ] Create `skill_gap_analyzer.py`:
-  - [ ] Extract required skills from job posting
-  - [ ] Extract candidate skills from resume
-  - [ ] Identify:
-    - [ ] Matched skills (highlight overlaps)
-    - [ ] Missing skills (gaps to address)
-    - [ ] Extra skills (candidate advantages)
-  
-  - [ ] Generate skill match percentage and breakdown
+- [x] **Experiment Log:** Test different ranking strategies (Experiment #6):
+  - [x] Pure Similarity: 0.660 sim, 7.4% skill, 9/10 diversity
+  - [x] MMR λ=0.5: 0.656 sim, 4.2% skill, **10/10 diversity** - **WINNER**
+  - [x] Skill reranking: Hurt both similarity AND skill match
 
-- [ ] **Experiment Log:** Refine skill matching logic:
-  - [ ] Exact vs. fuzzy matching for skill names
-  - [ ] Skill level consideration (junior vs. senior)
-  - [ ] Skill category grouping (frontend, backend, data, etc.)
+### Step 5.2: Implement Skill Gap Analysis ✓ COMPLETED
+- [x] Create `skill_gap_analyzer.py`:
+  - [x] Extract required skills from job posting (RAKE + granite4:micro)
+  - [x] Extract candidate skills from resume (LLM extraction)
+  - [x] Identify:
+    - [x] Matched skills (highlight overlaps)
+    - [x] Missing skills (gaps to address)
+    - [x] Extra skills (candidate advantages)
 
-### Step 5.3: Build Recommendation Result Object
-- [ ] Create data structure for recommendation results:
-  ```json
-  {
-    "job_id": "string",
-    "job_title": "string",
-    "company": "string",
-    "similarity_score": "float",
-    "skill_match_percentage": "float",
-    "matched_skills": ["string"],
-    "missing_skills": ["string"],
-    "candidate_extra_skills": ["string"],
-    "reasoning": "string"
-  }
-  ```
+  - [x] Generate skill match percentage and breakdown
 
-- [ ] Return top K matches (configurable, default 10)
-- [ ] Include reasoning/explanation for each match
+- [x] **Experiment Log:** RAKE + Ollama skill extraction (Experiment #5):
+  - [x] Tested 6 Ollama models for atomic skill extraction
+  - [x] **Winner:** granite4:micro (3.75s, most atomic output)
+  - [x] Key finding: Smaller models produce cleaner atomic skills
 
-### Step 5.4: Create Comprehensive Output Report
-- [ ] Generate detailed matching report:
-  - [ ] Resume summary
-  - [ ] Top job matches ranked by relevance
-  - [ ] Overall skill profile summary
-  - [ ] Recommendations for skill development
+### Step 5.3: Build Recommendation Result Object ✓ COMPLETED
+- [x] Create data structure for recommendation results:
+  - [x] RecommendationResult dataclass with all required fields
+  - [x] MatchingReport with skill profile summary
+  - [x] Development recommendations
 
-- [ ] Export formats:
-  - [ ] JSON (programmatic use)
-  - [ ] Markdown (readability)
-  - [ ] HTML (nice visualization)
+- [x] Return top K matches (configurable, default 10)
+- [x] Include reasoning/explanation for each match
 
-- [ ] **Learning Log:** Document recommendations quality and user feedback
+### Step 5.4: Create Comprehensive Output Report ✓ COMPLETED
+- [x] Generate detailed matching report:
+  - [x] Resume summary
+  - [x] Top job matches ranked by relevance
+  - [x] Overall skill profile summary
+  - [x] Recommendations for skill development
+
+- [x] Export formats:
+  - [x] JSON (programmatic use)
+  - [x] Markdown (readability)
+  - [x] HTML (nice visualization)
+
+- [x] **Learning Log:** Documented Phase 5 completion
+
+**Phase 5 Summary:**
+- **Matching Engine:** MatchingEngine class with MMR λ=0.5
+- **Skill Extraction:** RAKE + granite4:micro for atomic skills
+- **Report Generator:** JSON, MD, HTML formats
+- **Full Pipeline Test:** 45s for complete matching (Harper Russo resume)
 
 ---
 

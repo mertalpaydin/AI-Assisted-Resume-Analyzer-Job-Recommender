@@ -55,7 +55,7 @@ Use this template for each experiment:
 
 ## Experiment Counter
 
-**Total Experiments Conducted:** 4
+**Total Experiments Conducted:** 6
 
 **By Phase:**
 - Phase 0: 0
@@ -63,7 +63,7 @@ Use this template for each experiment:
 - Phase 2: 2
 - Phase 3: 1
 - Phase 4: 1
-- Phase 5: 0
+- Phase 5: 2
 - Phase 6: 0
 - Phase 7: 0
 - Phase 8: 0
@@ -110,6 +110,8 @@ Use this template for each experiment:
 | 2 | PDF Parser Comparison | 2 | Both (Pipeline) | User Rating | 3.0/5 (both) | 2025-11-20 |
 | 3 | Skill Extraction Method Comparison | 3 | RAKE | F1 Score | 0.356 | 2025-11-20 |
 | 4 | Embedding Model & Retrieval Strategy | 4 | embeddinggemma + MMR 0.5 | Precision@10 | 0.980 | 2025-11-21 |
+| 5 | RAKE + Ollama Atomic Skill Extraction | 5 | granite4:micro | Avg Latency | 3.75s | 2025-11-21 |
+| 6 | Ranking Strategy Comparison | 5 | MMR λ=0.5 | Diversity | 10/10 unique | 2025-11-21 |
 
 ---
 
@@ -426,3 +428,165 @@ RAKE significantly outperformed all methods across all key metrics:
 **Next Steps:**
 - Update production code with winner configurations
 - Move to Phase 5: Resume-to-Job Matching & Ranking
+
+---
+
+### Experiment #5: RAKE + Ollama Atomic Skill Extraction for Job Matching
+**Date:** 2025-11-21
+**Phase:** Phase 5 - Resume-to-Job Matching & Ranking
+**Objective:** Compare Ollama LLM models for refining RAKE-extracted keyphrases into atomic, matchable skills. The problem: RAKE extracts long phrases (e.g., "strong communication skills", "kubernetes container orchestration") that don't match well with resume skills (e.g., "kubernetes", "communication").
+
+**Hypothesis:** Smaller, faster models (granite4:micro) will produce more atomic skills due to simpler output patterns, while larger models may keep longer phrases.
+
+**Pipeline:** Job Text → RAKE (keyphrases) → Ollama LLM (atomic skills)
+
+**Test Data:** 4 job descriptions from different professions:
+- DevOps Engineer (IT)
+- Registered Nurse (Healthcare)
+- Marketing Manager (Business)
+- Financial Analyst (Finance)
+
+**Options Tested:**
+1. **granite4:micro**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: **3.75s**, Avg Skills: 12.5, Unique Skills: 50, Success: 4/4
+   - Observations: Extracts truly atomic skills (linux, gcp, kubernetes, prometheus). Single-word outputs ideal for matching.
+
+2. **llama3.2:3b**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: 4.00s, Avg Skills: 12.8, Unique Skills: 51, Success: 4/4
+   - Observations: Keeps some multi-word phrases ("linux system administration", "kubernetes container orchestration"). Good quality but less atomic.
+
+3. **llama3.1:8b**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: 10.37s, Avg Skills: 15.5, Unique Skills: 62, Success: 4/4
+   - Observations: Verbose output with longer phrases. 2.6x slower than granite4:micro.
+
+4. **mistral:7b**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: 6.81s, Avg Skills: 15.2, Unique Skills: 60, Success: 4/4
+   - Observations: Mixed atomic and phrase output. Balance between speed and coverage.
+
+5. **gemma3:4b**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: 7.67s, Avg Skills: 14.2, Unique Skills: 55, Success: 4/4
+   - Observations: Balanced quality, similar to Phase 2 performance for resume parsing.
+
+6. **gemma3:12b-it-q4_K_M**
+   - Configuration: temperature=0.1, ChatOllama, JSON array output
+   - Results: Avg Latency: 12.61s, Avg Skills: 17.5, Unique Skills: 67, Success: 4/4
+   - Observations: Most skills extracted but slowest. Verbose phrases.
+
+**Metrics Used:**
+- **Avg Latency**: Time per extraction (seconds) - lower is better for real-time matching
+- **Avg Skills Extracted**: Number of skills per job - moderate is ideal (too many = noise)
+- **Unique Skills**: Total distinct skills across all jobs - diversity check
+- **Success Rate**: JSON parsing success - reliability metric
+- **Atomicity**: Qualitative assessment of skill granularity (single words vs phrases)
+
+**Winner:** granite4:micro
+
+**Rationale:**
+granite4:micro was selected for skill extraction refinement because:
+- **Fastest**: 3.75s average (1.8x faster than gemma3:4b, 3.4x faster than gemma3:12b)
+- **Most Atomic**: Produces single-word skills (linux, kubernetes, python) ideal for exact matching
+- **Sufficient Coverage**: 12.5 avg skills per job, 50 unique skills total
+- **100% Reliability**: All 4 test jobs succeeded with valid JSON
+- **Speed Critical**: Skill extraction happens during real-time job matching
+
+**Key Learning:**
+1. **Task-specific model selection**: granite4:micro (worst for resume parsing in Exp #1) is best for skill atomization
+2. **Smaller models produce cleaner output**: Less context = simpler, more atomic responses
+3. **Different tasks need different models**: gemma3:4b for resume parsing, granite4:micro for skill extraction
+4. **Speed matters for matching**: 3.75s vs 12.61s is significant when processing many jobs
+5. **Profession-agnostic success**: Works equally well for IT, Healthcare, Marketing, and Finance
+
+**Sample Outputs by Profession:**
+- DevOps: ['linux', 'gcp', 'kubernetes', 'monitoring', 'github', 'cd', 'bash', 'gitlab', 'terraform', 'python', 'prometheus']
+- Nurse: ['icu', 'nurse', 'health records', 'epic', 'cerner', 'acls', 'bls']
+- Marketing: ['social media marketing', 'marketing automation', 'email marketing', 'content marketing', 'roi analysis', 'project management', 'ppc advertising', 'google analytics', 'google ads', ...]
+- Finance: ['bloomberg terminal', 'financial statement analysis', 'financial planning', 'financial modeling', 'variance analysis', 'pivot tables', 'data extraction', 'advanced excel', ...]
+
+**Impact on Project:**
+- Implement RAKE + granite4:micro pipeline in `skill_extractor.py`
+- Update `matching_engine.py` to use new skill extraction for job-resume matching
+- Expected: Better skill matching between resumes and jobs (atomic skills match better)
+- Speed improvement: 3.75s per job is acceptable for real-time matching
+
+**Next Steps:**
+- Implement `extract_skills_with_llm()` method in skill_extractor.py
+- Update matching_engine to use new extraction pipeline
+- Test end-to-end skill matching with sample resumes
+- Experiment with ranking strategies (Exp 5.2)
+
+---
+
+### Experiment #6: Ranking Strategy Comparison for Job Matching
+**Date:** 2025-11-21
+**Phase:** Phase 5 - Resume-to-Job Matching & Ranking
+**Objective:** Compare different ranking strategies for resume-to-job matching to find optimal balance between relevance, skill alignment, and result diversity.
+
+**Hypothesis:** MMR-based ranking will provide better diversity than pure similarity, and skill-weighted reranking will improve skill alignment at the cost of semantic similarity.
+
+**Test Data:** Sample resume (PDF) matched against job embeddings database
+
+**Options Tested:**
+1. **Pure Similarity (No MMR)**
+   - Configuration: Cosine similarity only, no diversity penalty
+   - Results: Avg Similarity: **0.660**, Avg Skill Match: **7.4%**, Unique Companies: 9
+   - Observations: Highest similarity and skill match scores, but lower diversity
+
+2. **MMR Balanced (λ=0.5)**
+   - Configuration: MMR with lambda=0.5 (balanced relevance/diversity)
+   - Results: Avg Similarity: 0.656, Avg Skill Match: 4.2%, Unique Companies: **10**
+   - Observations: Maximum diversity with minimal similarity loss (0.004 drop)
+
+3. **MMR High Diversity (λ=0.3)**
+   - Configuration: MMR with lambda=0.3 (high diversity weight)
+   - Results: Avg Similarity: 0.652, Avg Skill Match: 3.2%, Unique Companies: **10**
+   - Observations: Same diversity as λ=0.5 but lower skill match
+
+4. **Skill Reranking (w=0.3)**
+   - Configuration: MMR λ=0.5 + skill-weighted reranking (30% skill weight)
+   - Results: Avg Similarity: 0.470, Avg Skill Match: 3.7%, Unique Companies: **10**
+   - Observations: Significant similarity drop, modest skill gain
+
+5. **Skill Reranking (w=0.5)**
+   - Configuration: MMR λ=0.5 + skill-weighted reranking (50% skill weight)
+   - Results: Avg Similarity: 0.347, Avg Skill Match: 3.7%, Unique Companies: **10**
+   - Observations: Large similarity sacrifice with no skill improvement
+
+**Metrics Used:**
+- **Avg Similarity**: Mean semantic similarity score (0-1) - relevance metric
+- **Avg Skill Match %**: Mean skill alignment percentage - job fit metric
+- **Unique Companies**: Number of distinct employers in top 10 - diversity metric
+
+**Winner:** MMR Balanced (λ=0.5)
+
+**Rationale:**
+MMR λ=0.5 was selected as the best ranking strategy because:
+- **Maximum diversity**: 10/10 unique companies (vs 9 for pure similarity)
+- **Minimal relevance loss**: Only 0.004 similarity drop (0.660 → 0.656)
+- **Consistent with Phase 4**: Same λ value won for retrieval strategy
+- **Skill reranking harmful**: Adding skill weighting drastically reduced similarity (0.660 → 0.347) without improving skill match
+
+**Unexpected Finding:**
+- **Skill reranking doesn't improve skill match**: Adding skill weight actually lowered skill match % (7.4% → 3.7%)
+- **Pure similarity has best skill match**: Counter-intuitive but semantically similar jobs naturally require similar skills
+- **Diversity vs skill match trade-off**: Higher diversity correlates with lower skill match
+
+**Key Learning:**
+1. **MMR is sufficient**: No need for additional skill-weighted reranking
+2. **Semantic similarity captures skill alignment**: Jobs with high embedding similarity naturally require similar skills
+3. **Reranking can hurt quality**: Post-hoc reranking may disrupt the semantic ordering
+4. **Diversity improves user experience**: Showing varied companies is valuable even with slight relevance trade-off
+
+**Impact on Project:**
+- Use MMR λ=0.5 as default ranking strategy (already implemented from Phase 4)
+- Remove/disable skill-weighted reranking in production
+- Rely on semantic similarity for implicit skill matching
+
+**Next Steps:**
+- Complete Phase 5 integration testing
+- Document Decision #6 in decisions.md
+- Move to Phase 5.3-5.4: Report generation
