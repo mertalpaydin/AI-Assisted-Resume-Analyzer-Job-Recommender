@@ -46,7 +46,7 @@
       "boot fastapi": 0.2022,
       "cd pipelines": 0.1728
     },
-    "execution_time": 3.777082920074463,
+    "execution_time": 3.068441390991211,
     "num_skills": 20,
     "precision": 0.15,
     "recall": 0.12,
@@ -101,7 +101,7 @@
       "javascript java": 0.1401,
       "strong background": 0.1334
     },
-    "execution_time": 45.4226393699646,
+    "execution_time": 3.2336337566375732,
     "num_skills": 20,
     "precision": 0.15,
     "recall": 0.12,
@@ -154,7 +154,7 @@
       "expert in machine": 0.14673157333515752,
       "language processing": 0.14673157333515752
     },
-    "execution_time": 0.7247657775878906,
+    "execution_time": 0.39488887786865234,
     "num_skills": 19,
     "precision": 0.3157894736842105,
     "recall": 0.24,
@@ -226,7 +226,7 @@
       "aws": 0.1111111111111111,
       "7": 0.1111111111111111
     },
-    "execution_time": 0.29270339012145996,
+    "execution_time": 0.6127288341522217,
     "num_skills": 20,
     "precision": 0.4,
     "recall": 0.32,

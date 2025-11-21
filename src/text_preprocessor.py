@@ -4,8 +4,8 @@ Text Preprocessing Module
 This module provides comprehensive text preprocessing utilities for resume and job posting text.
 Features include cleaning, tokenization, lemmatization, and stopword removal using spaCy.
 
-Author: AI Resume Analyzer Project
-Date: 2025-01-20
+Author: Mert Alp Aydin
+Date: 2025-11-20
 """
 
 import re

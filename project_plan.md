@@ -79,10 +79,9 @@
     - [x] gemma3:4b - verify functionality
   - [x] Document model characteristics: size, latency, response quality
 
-- [ ] Prepare sample resumes:
-  - [ ] Create 3-5 realistic test resumes in PDF format
-  - [ ] Ensure they cover different experience levels and industries
-  - [x] **Experiment Log:** Try resumes with varying formatting (headers, bullets, paragraphs)
+- [x] Prepare sample resumes:
+  - [x] Create 3-5 realistic test resumes in PDF format
+  - [x] Ensure they cover different experience levels a**Experiment Log:** Try resumes with varying formatting (headers, bullets, paragraphs)
 
 - [x] **Learning Log:** Document initial observations about data structure, models, and potential challenges
 
@@ -234,8 +233,10 @@
 
 ## Phase 4: Embedding Generation & Vector Storage (Chunking Strategy)
 
+**Status:** Code implementation complete. Pending: experiments, logging updates, full embedding execution.
+
 ### Step 4.1: Intelligent Job Chunking
-- [ ] Create `JobChunker` class:
+- [x] Create `JobChunker` class:
   - [ ] Semantic chunking (split by sections: title, description, requirements)
   - [ ] if a section is too large split to chunks again based on max_char
   - [ ] Mark each chunk with job_id and chunk_num for easier reconstruction

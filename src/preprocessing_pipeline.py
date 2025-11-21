@@ -4,8 +4,8 @@ Preprocessing Pipeline Module
 This module provides a unified preprocessing pipeline that combines text cleaning,
 tokenization, lemmatization, and skill extraction for resume and job posting analysis.
 
-Author: AI Resume Analyzer Project
-Date: 2025-01-20
+Author: Mert Alp Aydin
+Date: 2025-11-20
 """
 
 import logging

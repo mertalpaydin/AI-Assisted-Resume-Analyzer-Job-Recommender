@@ -4,8 +4,8 @@ Skill Extraction Module
 This module provides skill extraction capabilities using KeyBERT for resume and job posting analysis.
 Features include keyword extraction, skill normalization, and custom skill databases.
 
-Author: AI Resume Analyzer Project
-Date: 2025-01-20
+Author: Mert Alp Aydin
+Date: 2025-11-20
 """
 
 import logging

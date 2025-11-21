@@ -24,16 +24,24 @@ from pathlib import Path
 import sys
 
 # Add src to path
-sys.path.append(str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from skill_extractor import SkillExtractor, SkillNormalizer
 from keybert import KeyBERT
 import spacy
 
-# Set up logging
+# Set up logging with file handler
+log_dir = Path(__file__).parent.parent / "logs"
+log_dir.mkdir(parents=True, exist_ok=True)
+log_file = log_dir / "debug.log"
+
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_file, mode='a', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -488,10 +496,8 @@ if __name__ == "__main__":
     print_comparison_table(results)
 
     # Save results
-    experiment.save_results(
-        results,
-        "experiments/results/skill_extraction_comparison.json"
-    )
+    output_path = Path(__file__).parent / "results" / "skill_extraction_comparison.json"
+    experiment.save_results(results, str(output_path))
 
     # Print winner
     print("\n" + "="*120)
