@@ -43,6 +43,7 @@ numpy
 # WEB UI (Optional)
 # ====================
 streamlit
+plotly
 
 # ====================
 # UTILITIES

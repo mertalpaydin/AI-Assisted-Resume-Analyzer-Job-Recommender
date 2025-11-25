@@ -382,59 +382,113 @@
 
 ## Phase 6: Streamlit UI
 
-### Step 6.1: Design Streamlit Application Layout
-- [ ] Create `app.py`:
-  - [ ] File upload component for PDF resumes
-  - [ ] Processing status indicator
-  - [ ] Results display sections:
-    - [ ] Resume summary overview
-    - [ ] Top job matches table/cards
-    - [ ] Skill match breakdown (bar chart)
-    - [ ] Skill gap visualization
+### Step 6.1: Design Streamlit Application Layout ✓ COMPLETED
+- [x] Create `app.py`:
+  - [x] File upload component for PDF resumes
+  - [x] Processing status indicator
+  - [x] Results display sections:
+    - [x] Resume summary overview
+    - [x] Top job matches table/cards
+    - [x] Skill match breakdown (bar chart)
+    - [x] Skill gap visualization
     - [ ] AI-generated match insights (placeholder for Phase 7)
 
-### Step 6.2: Implement Resume Upload & Processing
-- [ ] Handle file uploads:
-  - [ ] Validate PDF format and size
-  - [ ] Show processing progress
-  - [ ] Handle errors gracefully
+### Step 6.2: Implement Resume Upload & Processing ✓ COMPLETED
+- [x] Handle file uploads:
+  - [x] Validate PDF format and size
+  - [x] Show processing progress
+  - [x] Handle errors gracefully
 
-- [ ] Display parsing results:
-  - [ ] Show extracted resume data
-  - [ ] Allow manual corrections if needed
-  - [ ] Confirm before proceeding to matching
+- [x] Display parsing results:
+  - [x] Show extracted resume data
+  - [x] Confirm before proceeding to matching
 
-### Step 6.3: Implement Interactive Results Display
-- [ ] Create tabs/sections for:
-  - [ ] Overview dashboard
-  - [ ] Detailed job matches with filtering/sorting
-  - [ ] Skill analysis and gap visualization
+### Step 6.3: Implement Interactive Results Display ✓ COMPLETED
+- [x] Create tabs/sections for:
+  - [x] Overview dashboard
+  - [x] Detailed job matches with filtering/sorting
+  - [x] Skill analysis and gap visualization
   - [ ] AI insights section (placeholder)
-  - [ ] Get Detailed Insights section (placeholder)
-  - [ ] Export options
+  - [x] Get Detailed Insights section (placeholder)
+  - [x] Export options
 
-- [ ] Add interactivity:
-  - [ ] Filter by job category, location, etc.
-  - [ ] Click through for detailed job posting view
-  - [ ] Copy suggestions to clipboard
-  - [ ] Similarity threshold slider (default 60%)
+- [x] Add interactivity:
+  - [x] Filter/search by job title, company name etc.
+  - [x] Click through for detailed job posting view
+  - [x] Copy suggestions to clipboard
+  - [x] Similarity threshold slider (default 60%)
 
-### Step 6.4: Deploy & Optimize
-- [ ] Optimize for performance:
-  - [ ] Cache embeddings and FAISS index
-  - [ ] Lazy load heavy models
-  - [ ] Session state management
+### Step 6.4: Deploy & Optimize ✓ COMPLETED
+- [x] Optimize for performance:
+  - [x] Cache embeddings and FAISS index
+  - [x] Lazy load heavy models
+  - [x] Session state management
 
-- [ ] Add configuration panel:
-  - [ ] Top K results
-  - [ ] Similarity threshold
+- [x] Add configuration panel:
+  - [x] Top K results
+  - [x] Similarity threshold (in Job Matches tab)
 
-- [ ] Deploy options:
-  - [ ] Local Streamlit server
-  - [ ] Streamlit Cloud deployment (optional)
-  - [ ] Docker containerization (optional)
+- [x] Deploy options:
+  - [x] Local Streamlit server
 
-### Step 6.5: STRETCH GOAL – Async Streaming Results
+### Step 6.5: Fix Issues & Improve UX
+**Status:** In Progress
+
+**Configuration Improvements:**
+- [ ] Move similarity threshold from Job Matches tab to sidebar configuration
+  - Currently: Filter slider in Job Matches tab
+  - Target: Main sidebar with other config options
+  - Default: x% where x is the 10th match
+
+**Content Display Fixes:**
+- [ ] Fix company/location information display
+  - Issue: Showing raw dict `{'addressLine': 'Remote', 'city': '', ...}`
+  - Target: Clean formatted string "Remote" or "Pittsburgh, PA"
+  - Implementation: Parse location dict and extract meaningful fields
+
+- [ ] Show full job description in Job Matches tab
+  - Issue: Description truncated to 500 characters
+  - Target: Full description in expandable section
+  - Keep truncated preview in card, full text in expander
+
+**Visualization Improvements:**
+- [ ] Replace grouped bar chart in Overview tab
+  - Issue: Not intuitive for comparing skill match vs similarity
+  - Options to consider (apply all and ask user to select):
+    - Scatter plot (x=similarity, y=skill match, color by company)
+    - Table with sortable columns
+    - Card grid with key metrics
+    - Radar/spider chart for multi-dimensional view
+  - Decision: TBD (discuss with user)
+
+**AI Insights Placeholders (Phase 7 Preparation):**
+- [ ] Add placeholder sections for AI-generated insights
+  - Location 1: Job Matches tab - "AI Match Insights" expander (disabled/grayed out)
+  - Location 2: Overview tab - "AI Recommendations" section (coming soon message)
+  - Include informative message: "AI insights coming in Phase 7"
+  - Prepare structure for future Ollama/Gemini integration
+
+**Critical Fix: Skill Matching Algorithm:**
+- [ ] Investigate current skill matching implementation
+  - Problem: 0% skill matches for most resumes
+  - Example mismatches:
+    - Resume: "SQL database management" vs Job: "sql queries" (should match)
+    - Resume: "Machine learning frameworks" vs Job: "machine learning" (should match)
+
+- [ ] Discuss and implement improved matching strategy:
+  - **Current:** Exact string matching (case-insensitive)
+  - **Options: (Test all and document under experiment and decision log)**
+    1. Fuzzy matching (Levenshtein distance, threshold ~80%)
+    2. Semantic similarity (using sentence-transformers EmbeddingGemma)
+    3. Keyword/n-gram overlap
+    4. Hybrid approach (combine multiple methods)
+
+- [ ] Test improved matching on sample resumes
+  - Validate match quality improvement
+  - Measure performance impact
+  - Update skill extraction if needed
+
+### Step 6.6: STRETCH GOAL – Async Streaming Results
 - [ ] Implement async job matching:
   - [ ] Jobs appear on UI as they're identified (above threshold)
   - [ ] Results sorted dynamically as matches stream in
