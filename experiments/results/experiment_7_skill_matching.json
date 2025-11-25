@@ -1,0 +1,142 @@
+{
+  "experiment": "Skill Matching Strategy Comparison",
+  "date": "2025-11-25 22:59:59",
+  "test_case": {
+    "resume": "Resume - Data Scientist.pdf",
+    "resume_skills_count": 7,
+    "resume_skills": [
+      "Python programming",
+      "R statistical analysis",
+      "SQL database management",
+      "Machine learning frameworks",
+      "Data visualization tools",
+      "Statistical modeling",
+      "Tableau"
+    ],
+    "job_title": "Senior Data Scientist",
+    "job_company": "OrangePeople",
+    "job_skills_count": 6,
+    "job_skills": [
+      "sql queries",
+      "data models",
+      "project management",
+      "consulting practices",
+      "team coordination",
+      "predictive modeling"
+    ]
+  },
+  "results": [
+    {
+      "name": "Exact Match (Current)",
+      "threshold": 0.0,
+      "match_percentage": 0.0,
+      "matched_count": 0,
+      "missing_count": 6,
+      "latency_ms": 0.0,
+      "matched_skills": [],
+      "missing_skills": [
+        "consulting practices",
+        "data models",
+        "predictive modeling",
+        "project management",
+        "sql queries",
+        "team coordination"
+      ],
+      "details": []
+    },
+    {
+      "name": "Fuzzy Match (Levenshtein)",
+      "threshold": 0.7,
+      "match_percentage": 0.0,
+      "matched_count": 0,
+      "missing_count": 6,
+      "latency_ms": 95.7,
+      "matched_skills": [],
+      "missing_skills": [
+        "consulting practices",
+        "data models",
+        "predictive modeling",
+        "project management",
+        "sql queries",
+        "team coordination"
+      ],
+      "details": []
+    },
+    {
+      "name": "Semantic Match (EmbeddingGemma)",
+      "threshold": 0.65,
+      "match_percentage": 50.0,
+      "matched_count": 3,
+      "missing_count": 3,
+      "latency_ms": 228.6,
+      "matched_skills": [
+        "data models",
+        "predictive modeling",
+        "sql queries"
+      ],
+      "missing_skills": [
+        "consulting practices",
+        "project management",
+        "team coordination"
+      ],
+      "details": [
+        {
+          "job_skill": "sql queries",
+          "resume_skill": "sql database management",
+          "similarity": 0.766
+        },
+        {
+          "job_skill": "data models",
+          "resume_skill": "statistical modeling",
+          "similarity": 0.721
+        },
+        {
+          "job_skill": "predictive modeling",
+          "resume_skill": "statistical modeling",
+          "similarity": 0.785
+        }
+      ]
+    },
+    {
+      "name": "Keyword Overlap",
+      "threshold": 0.5,
+      "match_percentage": 0.0,
+      "matched_count": 0,
+      "missing_count": 6,
+      "latency_ms": 0.3,
+      "matched_skills": [],
+      "missing_skills": [
+        "consulting practices",
+        "data models",
+        "predictive modeling",
+        "project management",
+        "sql queries",
+        "team coordination"
+      ],
+      "details": []
+    },
+    {
+      "name": "Hybrid (Fuzzy+Keyword)",
+      "threshold": 0.65,
+      "match_percentage": 0.0,
+      "matched_count": 0,
+      "missing_count": 6,
+      "latency_ms": 0.9,
+      "matched_skills": [],
+      "missing_skills": [
+        "consulting practices",
+        "data models",
+        "predictive modeling",
+        "project management",
+        "sql queries",
+        "team coordination"
+      ],
+      "details": []
+    }
+  ],
+  "winner": {
+    "strategy": "Semantic Match (EmbeddingGemma)",
+    "match_percentage": 50.0,
+    "threshold": 0.65
+  }
+}

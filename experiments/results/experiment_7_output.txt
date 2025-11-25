@@ -1,0 +1,188 @@
+22:58:52 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+2025-11-25 22:58:52,146 - resume_extractor - INFO - Initializing ResumeExtractor with model: gemma3:4b
+22:58:52 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+2025-11-25 22:58:52,146 - pdf_parser - INFO - PDFResumeParser initialized with default loader: pdfplumber
+22:58:52 - INFO - ResumeExtractor initialized successfully
+2025-11-25 22:58:52,466 - resume_extractor - INFO - ResumeExtractor initialized successfully
+22:58:52 - INFO - Extracting resume from PDF: Resume - Data Scientist.pdf
+2025-11-25 22:58:52,466 - resume_extractor - INFO - Extracting resume from PDF: Resume - Data Scientist.pdf
+22:58:52 - INFO - Dual-parser mode: ENABLED
+2025-11-25 22:58:52,467 - resume_extractor - INFO - Dual-parser mode: ENABLED
+22:58:52 - INFO - Step 1: Parsing PDF with PDFPlumber...
+2025-11-25 22:58:52,467 - resume_extractor - INFO - Step 1: Parsing PDF with PDFPlumber...
+22:58:52 - INFO - Parsing with PDFPlumber: Resume - Data Scientist.pdf
+2025-11-25 22:58:52,468 - pdf_parser - INFO - Parsing with PDFPlumber: Resume - Data Scientist.pdf
+22:58:52 - INFO - PDFPlumber success: 1 pages, 184 words, 0.15s
+2025-11-25 22:58:52,615 - pdf_parser - INFO - PDFPlumber success: 1 pages, 184 words, 0.15s
+22:58:52 - INFO - PDFPlumber parsed: 1358 characters
+2025-11-25 22:58:52,615 - resume_extractor - INFO - PDFPlumber parsed: 1358 characters
+22:58:52 - INFO - Step 2: Extracting structured data with LLM (first pass - PDFPlumber)...
+2025-11-25 22:58:52,615 - resume_extractor - INFO - Step 2: Extracting structured data with LLM (first pass - PDFPlumber)...
+22:58:52 - INFO - Sending to LLM...
+2025-11-25 22:58:52,615 - resume_extractor - INFO - Sending to LLM...
+2025-11-25 22:58:54,872 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+22:59:02 - INFO - LLM response received in 10.31s
+2025-11-25 22:59:02,921 - resume_extractor - INFO - LLM response received in 10.31s
+22:59:02 - INFO - Resume successfully parsed and validated
+2025-11-25 22:59:02,921 - resume_extractor - INFO - Resume successfully parsed and validated
+22:59:02 - INFO - First pass extraction successful
+2025-11-25 22:59:02,921 - resume_extractor - INFO - First pass extraction successful
+22:59:02 - INFO - Step 3: Parsing PDF with PyPDF (second parser)...
+2025-11-25 22:59:02,921 - resume_extractor - INFO - Step 3: Parsing PDF with PyPDF (second parser)...
+22:59:02 - INFO - Parsing with PyPDF: Resume - Data Scientist.pdf
+2025-11-25 22:59:02,921 - pdf_parser - INFO - Parsing with PyPDF: Resume - Data Scientist.pdf
+22:59:03 - INFO - PyPDF success: 1 pages, 1173 words, 0.09s
+2025-11-25 22:59:03,013 - pdf_parser - INFO - PyPDF success: 1 pages, 1173 words, 0.09s
+22:59:03 - INFO - PyPDF parsed: 2485 characters
+2025-11-25 22:59:03,013 - resume_extractor - INFO - PyPDF parsed: 2485 characters
+22:59:03 - INFO - Step 4: Refining extraction with LLM (second pass - PyPDF)...
+2025-11-25 22:59:03,013 - resume_extractor - INFO - Step 4: Refining extraction with LLM (second pass - PyPDF)...
+22:59:03 - INFO - Sending refinement request to LLM...
+2025-11-25 22:59:03,013 - resume_extractor - INFO - Sending refinement request to LLM...
+2025-11-25 22:59:04,363 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+22:59:15 - INFO - LLM refinement response received in 12.27s
+2025-11-25 22:59:15,284 - resume_extractor - INFO - LLM refinement response received in 12.27s
+22:59:15 - INFO - Refined resume successfully parsed and validated
+2025-11-25 22:59:15,284 - resume_extractor - INFO - Refined resume successfully parsed and validated
+22:59:15 - INFO - Resume extraction successful in 22.82s (dual-parser mode)
+2025-11-25 22:59:15,284 - resume_extractor - INFO - Resume extraction successful in 22.82s (dual-parser mode)
+2025-11-25 22:59:15,284 - matching_engine - INFO - Initializing MatchingEngine...
+22:59:15 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+2025-11-25 22:59:15,284 - resume_extractor - INFO - Initializing ResumeExtractor with model: gemma3:4b
+22:59:15 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+2025-11-25 22:59:15,284 - pdf_parser - INFO - PDFResumeParser initialized with default loader: pdfplumber
+22:59:15 - INFO - ResumeExtractor initialized successfully
+2025-11-25 22:59:15,637 - resume_extractor - INFO - ResumeExtractor initialized successfully
+2025-11-25 22:59:15,638 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-11-25 22:59:15,638 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: google/embeddinggemma-300m
+2025-11-25 22:59:21,595 - sentence_transformers.SentenceTransformer - INFO - 14 prompts are loaded, with the keys: ['query', 'document', 'BitextMining', 'Clustering', 'Classification', 'InstructionRetrieval', 'MultilabelClassification', 'PairClassification', 'Reranking', 'Retrieval', 'Retrieval-query', 'Retrieval-document', 'STS', 'Summarization']
+2025-11-25 22:59:21,596 - embedding_generator - INFO - Loaded model google/embeddinggemma-300m with dimension 768
+2025-11-25 22:59:21,596 - embedding_generator - INFO - ChunkEmbeddingGenerator initialized with google/embeddinggemma-300m (dim=768)
+2025-11-25 22:59:21,596 - skill_extractor - INFO - Initializing SkillExtractor with model: all-MiniLM-L6-v2
+2025-11-25 22:59:21,597 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-11-25 22:59:21,597 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-25 22:59:24,940 - skill_extractor - INFO - KeyBERT model initialized successfully
+2025-11-25 22:59:25,222 - skill_extractor - INFO - spaCy model en_core_web_sm loaded successfully
+2025-11-25 22:59:25,222 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:25,222 - skill_extractor - INFO - SkillExtractor initialized (top_n=30, diversity=0.5)
+2025-11-25 22:59:25,225 - faiss.loader - INFO - Loading faiss with AVX2 support.
+2025-11-25 22:59:25,244 - faiss.loader - INFO - Successfully loaded faiss with AVX2 support.
+2025-11-25 22:59:25,249 - vector_store - INFO - Created FAISS flat index
+2025-11-25 22:59:25,249 - vector_store - INFO - ChunkVectorStore initialized: dim=768, type=flat
+2025-11-25 22:59:25,249 - job_id_mapper - INFO - JobIDMapper initialized
+2025-11-25 22:59:25,699 - vector_store - INFO - Vector store loaded from data\embeddings: 220902 vectors
+2025-11-25 22:59:42,287 - matching_engine - INFO - Loaded 220902 job embeddings
+2025-11-25 22:59:42,287 - matching_engine - INFO - Loaded 33064 jobs
+2025-11-25 22:59:42,287 - matching_engine - INFO - MatchingEngine initialized successfully
+2025-11-25 22:59:42,287 - matching_engine - INFO - Generating resume embedding...
+================================================================================
+EXPERIMENT #7: SKILL MATCHING STRATEGY COMPARISON
+Test Case: Peter Boyd - Data Scientist Resume
+================================================================================
+
+Test Resume: Resume - Data Scientist.pdf
+
+Step 1: Extracting resume...
+[OK] Extracted 7 skills from resume
+  Skills: Python programming, R statistical analysis, SQL database management, Machine learning frameworks, Data visualization tools, Statistical modeling, Tableau
+
+Step 2: Finding top matched job...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  1.26it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  1.26it/s]
+2025-11-25 22:59:43,093 - matching_engine - INFO - Searching for top 1 matching jobs...
+2025-11-25 22:59:45,294 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-25 22:59:45,452 - matching_engine - INFO - Found 1 job matches in 3.17s
+2025-11-25 22:59:45,452 - skill_extractor - INFO - Initializing SkillExtractor with model: all-MiniLM-L6-v2
+2025-11-25 22:59:45,453 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-11-25 22:59:45,453 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-25 22:59:48,536 - skill_extractor - INFO - KeyBERT model initialized successfully
+2025-11-25 22:59:48,790 - skill_extractor - INFO - spaCy model en_core_web_sm loaded successfully
+2025-11-25 22:59:48,791 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:48,791 - skill_extractor - INFO - SkillExtractor initialized (top_n=15, diversity=0.5)
+2025-11-25 22:59:49,618 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-25 22:59:49,953 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:49,954 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:49,954 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:49,955 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-11-25 22:59:49,955 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: google/embeddinggemma-300m
+2025-11-25 22:59:59,001 - sentence_transformers.SentenceTransformer - INFO - 14 prompts are loaded, with the keys: ['query', 'document', 'BitextMining', 'Clustering', 'Classification', 'InstructionRetrieval', 'MultilabelClassification', 'PairClassification', 'Reranking', 'Retrieval', 'Retrieval-query', 'Retrieval-document', 'STS', 'Summarization']
+2025-11-25 22:59:59,001 - __main__ - INFO - Loaded EmbeddingGemma for semantic matching
+2025-11-25 22:59:59,001 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:59,001 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:59,002 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-25 22:59:59,002 - skill_extractor - INFO - SkillNormalizer initialized with 80 canonical skills
+[OK] Top Job: Senior Data Scientist @ OrangePeople
+
+Step 3: Extracting job skills...
+[OK] Extracted 6 skills from job
+  Skills: sql queries, data models, project management, consulting practices, team coordination, predictive modeling
+
+================================================================================
+TESTING MATCHING STRATEGIES
+================================================================================
+
+Testing: Exact Match (Current)
+Threshold: 0.00
+[OK] Match Percentage: 0.0%
+  Matched: 0 skills
+  Missing: 6 skills
+  Latency: 0.0ms
+
+Testing: Fuzzy Match (Levenshtein)
+Threshold: 0.70
+[OK] Match Percentage: 0.0%
+  Matched: 0 skills
+  Missing: 6 skills
+  Latency: 95.7ms
+
+Testing: Semantic Match (EmbeddingGemma)
+Threshold: 0.65
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  8.98it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  8.96it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|##########| 1/1 [00:00<00:00, 10.27it/s]
+[OK] Match Percentage: 50.0%
+  Matched: 3 skills
+  Missing: 3 skills
+  Latency: 228.6ms
+  Examples:
+    'sql queries' <- 'sql database management' (0.77)
+    'data models' <- 'statistical modeling' (0.72)
+    'predictive modeling' <- 'statistical modeling' (0.79)
+
+Testing: Keyword Overlap
+Threshold: 0.50
+[OK] Match Percentage: 0.0%
+  Matched: 0 skills
+  Missing: 6 skills
+  Latency: 0.3ms
+
+Testing: Hybrid (Fuzzy+Keyword)
+Threshold: 0.65
+[OK] Match Percentage: 0.0%
+  Matched: 0 skills
+  Missing: 6 skills
+  Latency: 0.9ms
+
+================================================================================
+SUMMARY
+================================================================================
+
+Strategy                            Match %      Matched    Missing    Latency
+--------------------------------------------------------------------------------
+Exact Match (Current)                  0.0%       0/6        6/6         0.0ms
+Fuzzy Match (Levenshtein)              0.0%       0/6        6/6        95.7ms
+Semantic Match (EmbeddingGemma)       50.0%       3/6        3/6       228.6ms
+Keyword Overlap                        0.0%       0/6        6/6         0.3ms
+Hybrid (Fuzzy+Keyword)                 0.0%       0/6        6/6         0.9ms
+
+[WINNER] Semantic Match (EmbeddingGemma) with 50.0% match
+
+[OK] Results saved to: C:\Users\merta\OneDrive\Desktop\FS Courses\Personal Development\AI_Assisted_Resume_Analyzer_Job_Recommender\experiments\results\experiment_7_skill_matching.json
+
+================================================================================
+EXPERIMENT COMPLETE
+================================================================================
+
+Next steps:
+1. Review results in experiments/results/experiment_7_skill_matching.json
+2. Document findings in logs/experiment_log.md
+3. Update logs/decisions.md with chosen strategy
+4. Implement winning strategy in matching_engine.py

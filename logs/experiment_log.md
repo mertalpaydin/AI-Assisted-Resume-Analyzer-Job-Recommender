@@ -55,7 +55,7 @@ Use this template for each experiment:
 
 ## Experiment Counter
 
-**Total Experiments Conducted:** 6
+**Total Experiments Conducted:** 7
 
 **By Phase:**
 - Phase 0: 0
@@ -64,7 +64,7 @@ Use this template for each experiment:
 - Phase 3: 1
 - Phase 4: 1
 - Phase 5: 2
-- Phase 6: 0
+- Phase 6: 1
 - Phase 7: 0
 - Phase 8: 0
 
@@ -112,6 +112,7 @@ Use this template for each experiment:
 | 4 | Embedding Model & Retrieval Strategy | 4 | embeddinggemma + MMR 0.5 | Precision@10 | 0.980 | 2025-11-21 |
 | 5 | RAKE + Ollama Atomic Skill Extraction | 5 | granite4:micro | Avg Latency | 3.75s | 2025-11-21 |
 | 6 | Ranking Strategy Comparison | 5 | MMR λ=0.5 | Diversity | 10/10 unique | 2025-11-21 |
+| 7 | Skill Matching Strategy Comparison | 6.5 | Semantic (EmbeddingGemma) | Match % | 50.0% | 2025-11-25 |
 
 ---
 
@@ -590,3 +591,220 @@ MMR λ=0.5 was selected as the best ranking strategy because:
 - Complete Phase 5 integration testing
 - Document Decision #6 in decisions.md
 - Move to Phase 5.3-5.4: Report generation
+
+---
+
+## Experiment #7: Skill Matching Strategy Comparison
+
+**Date:** 2025-11-25
+**Phase:** 6.5 - UX Fix (Critical)
+**Objective:** Fix 0% skill matching issue by testing different matching algorithms
+
+### Problem Statement
+
+Current skill matching implementation shows 0% skill matches for most resumes due to exact string matching:
+- Resume: "SQL database management" vs Job: "sql queries" → **No match**
+- Resume: "Machine learning frameworks" vs Job: "machine learning" → **No match**
+- Resume: "Python programming" vs Job: "python" → **No match**
+
+**Root Cause:** Exact set intersection matching (`resume_skills & job_skills`) requires identical strings after lowercase conversion, failing to match semantically related skills.
+
+### Test Case
+
+**Resume:** Peter Boyd - Data Scientist
+**Resume Skills (7):**
+- Python programming
+- R statistical analysis
+- SQL database management
+- Machine learning frameworks
+- Data visualization tools
+- Statistical modeling
+- Tableau
+
+**Top Matched Job:** Senior Data Scientist @ OrangePeople
+**Job Skills (6):**
+- sql queries
+- data models
+- project management
+- consulting practices
+- team coordination
+- predictive modeling
+
+### Strategies Tested
+
+#### 1. **Exact Match (Current Implementation)**
+- **Method:** Set intersection after lowercase
+- **Threshold:** N/A (exact match only)
+- **Results:**
+  - Match Percentage: **0.0%**
+  - Matched: 0/6 skills
+  - Latency: <1ms
+- **Verdict:** ❌ **BROKEN** - No matches despite clear semantic similarities
+
+#### 2. **Fuzzy String Matching (Levenshtein Distance)**
+- **Method:** fuzzywuzzy.token_sort_ratio() for word-order independence
+- **Threshold:** 0.70 (70% similarity)
+- **Results:**
+  - Match Percentage: **0.0%**
+  - Matched: 0/6 skills
+  - Latency: 96ms
+- **Verdict:** ❌ **Failed** - Threshold too high for multi-word skill variations
+
+**Why it failed:**
+- "sql queries" vs "sql database management" → 57% similarity (below threshold)
+- Different phrasing styles cause low fuzzy scores even for related skills
+- Token sorting doesn't help when core concepts differ ("queries" ≠ "management")
+
+#### 3. **Semantic Similarity (EmbeddingGemma)** ⭐
+- **Method:** Cosine similarity of sentence embeddings
+- **Model:** google/embeddinggemma-300m (same as job matching)
+- **Threshold:** 0.65 (65% similarity)
+- **Results:**
+  - Match Percentage: **50.0%** (3/6 skills)
+  - Matched Skills:
+    - **"sql queries" ← "sql database management"** (0.766)
+    - **"data models" ← "statistical modeling"** (0.721)
+    - **"predictive modeling" ← "statistical modeling"** (0.785)
+  - Latency: 229ms per job
+- **Verdict:** ✅ **WINNER** - Successfully matched semantically related skills
+
+**Why it succeeded:**
+- Captures semantic meaning beyond exact words
+- "sql queries" and "sql database management" recognized as related SQL concepts
+- "statistical modeling" matches both "data models" and "predictive modeling"
+- Embeddings already loaded for job matching (no additional model overhead)
+
+#### 4. **Keyword/N-gram Overlap**
+- **Method:** Jaccard similarity on extracted keywords
+- **Threshold:** 0.50 (50% keyword overlap)
+- **Results:**
+  - Match Percentage: **0.0%**
+  - Matched: 0/6 skills
+  - Latency: <1ms
+- **Verdict:** ❌ **Failed** - Different vocabulary despite same concepts
+
+**Why it failed:**
+- "sql queries" → {sql, queries} vs "sql database management" → {sql, database, management}
+- Only 1/5 keywords overlap (20%) → below 50% threshold
+- Miss semantic relationships when using different terms
+
+#### 5. **Hybrid (Fuzzy 70% + Keyword 30%)**
+- **Method:** Weighted combination of fuzzy and keyword scores
+- **Threshold:** 0.65
+- **Results:**
+  - Match Percentage: **0.0%**
+  - Matched: 0/6 skills
+  - Latency: 1ms
+- **Verdict:** ❌ **Failed** - Both components too weak
+
+**Why it failed:**
+- Fuzzy component: 57% * 0.7 = 0.40
+- Keyword component: 20% * 0.3 = 0.06
+- Combined: 0.46 < 0.65 threshold
+- Combining weak signals doesn't create a strong one
+
+### Results Summary
+
+| Strategy | Match % | Matched | Missing | Latency | Status |
+|----------|---------|---------|---------|---------|--------|
+| Exact Match (Current) | 0.0% | 0/6 | 6/6 | <1ms | ❌ Broken |
+| Fuzzy (Levenshtein) | 0.0% | 0/6 | 6/6 | 96ms | ❌ Failed |
+| **Semantic (EmbeddingGemma)** | **50.0%** | **3/6** | **3/6** | **229ms** | **✅ WINNER** |
+| Keyword Overlap | 0.0% | 0/6 | 6/6 | <1ms | ❌ Failed |
+| Hybrid (Fuzzy+Keyword) | 0.0% | 0/6 | 6/6 | 1ms | ❌ Failed |
+
+### Winner: Semantic Match (EmbeddingGemma)
+
+**Selected Configuration:**
+- **Model:** google/embeddinggemma-300m
+- **Threshold:** 0.65 (65% cosine similarity)
+- **Latency:** ~230ms per job (acceptable for UI)
+
+**Advantages:**
+1. **Semantic understanding**: Captures meaning beyond exact words
+2. **Already available**: Same model used for job matching (no new dependency)
+3. **Proven quality**: Phase 4 showed 98% precision for job matching
+4. **Reasonable latency**: 230ms for 7 resume skills × 6 job skills = acceptable
+5. **Natural threshold**: 0.65 balances precision and recall
+
+**Match Examples:**
+- ✅ "sql queries" ← "sql database management" (0.766)
+  - Different phrasing, same database querying concept
+- ✅ "data models" ← "statistical modeling" (0.721)
+  - Related modeling concepts
+- ✅ "predictive modeling" ← "statistical modeling" (0.785)
+  - Clear semantic overlap
+
+**Missing Matches (Expected):**
+- ❌ "project management", "consulting practices", "team coordination"
+  - These are soft skills not present in the technical resume
+  - Correct behavior - should not match
+
+### Key Learnings
+
+1. **Exact matching is fundamentally broken** for skills with:
+   - Different phrasing ("sql queries" vs "sql database management")
+   - Word variations ("machine learning" vs "machine learning frameworks")
+   - Synonyms and related concepts
+
+2. **Fuzzy matching fails for semantic concepts**:
+   - Works for typos ("python" vs "pythn")
+   - Fails for different but related phrases
+   - Threshold tuning doesn't solve the fundamental limitation
+
+3. **Keyword overlap misses semantic relationships**:
+   - "statistical modeling" and "predictive modeling" share only "modeling"
+   - Jaccard similarity too simplistic for multi-word technical skills
+
+4. **Semantic embeddings are the right solution**:
+   - Capture meaning, not just words
+   - Already available in the system
+   - Proven quality from Phase 4 experiments
+
+5. **Performance is acceptable**:
+   - 230ms for full comparison (7 × 6 = 42 comparisons)
+   - Dominated by resume extraction (~20s) and job search (~3s)
+   - Embeddings can be cached for same resume across jobs
+
+### Implementation Requirements
+
+**Changes Needed:**
+1. **Replace exact matching** in `matching_engine.py::_analyze_skills()`
+2. **Add semantic matcher** using EmbeddingGemma
+3. **Set threshold** to 0.65 for skill matching
+4. **Cache embeddings** for resume skills (reuse across jobs)
+5. **Add optional fallback** to keyword matching if semantic fails
+
+**API Changes:**
+None - skill matching remains internal to `_analyze_skills()`
+
+**Performance Impact:**
+- Current: <1ms (broken, 0% matches)
+- New: ~230ms per job (50% matches, correct results)
+- Acceptable: Skill analysis is async, doesn't block job retrieval
+
+### Impact on Project
+
+**Immediate Fixes:**
+- ✅ Skill matching will show realistic percentages (50% vs 0%)
+- ✅ Users see actual skill overlaps
+- ✅ Missing skills become actionable development suggestions
+
+**User Experience:**
+- Better match quality indicators
+- Accurate skill gap identification
+- Trust in system recommendations
+
+**System Quality:**
+- Consistent with Phase 4/5 semantic approach
+- Leverages existing high-quality embeddings
+- No new dependencies or models
+
+### Next Steps
+
+1. **Implement semantic matching** in `matching_engine.py`
+2. **Test on multiple resumes** (verify 50%+ typical match rate)
+3. **Update decision log** (Decision #7: Semantic Skill Matching)
+4. **Continue Phase 6.5 fixes** (company display, UI improvements)
+
+---

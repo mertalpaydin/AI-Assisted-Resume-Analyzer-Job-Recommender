@@ -249,29 +249,83 @@ class MatchingEngine:
         return " ".join(parts)
 
     def _analyze_skills(self, resume: Resume, job: JobPosting) -> Dict[str, Any]:
-        """Analyze skill match between resume and job."""
+        """
+        Analyze skill match between resume and job using semantic similarity.
+
+        Uses EmbeddingGemma to match skills semantically rather than exact string matching.
+        Threshold: 0.65 cosine similarity (Decision #7, Experiment #7)
+        """
+        import numpy as np
+
         # Get resume skills (from extraction)
-        resume_skills = set(s.lower() for s in resume.skills)
+        resume_skills_raw = resume.skills
+        resume_skills = [s.lower() for s in resume_skills_raw]
 
-        # Extract job skills from description (job description contains requirements)
+        # Extract job skills from description
         job_text = f"{job.title} {job.description}"
-
         job_skills_extracted = self.skill_extractor.extract_skills(
             job_text, method="rake_llm", top_n=10
         )
-        job_skills = set(s.lower() for s in job_skills_extracted)
+        job_skills = [s.lower() for s in job_skills_extracted]
 
-        # Match skills
-        matched = resume_skills & job_skills
-        missing = job_skills - resume_skills
-        extra = resume_skills - job_skills
+        # If either list is empty, return early
+        if not resume_skills or not job_skills:
+            return {
+                'matched_skills': [],
+                'missing_skills': job_skills,
+                'extra_skills': resume_skills,
+                'match_percentage': 0.0,
+                'total_job_skills': len(job_skills),
+                'total_resume_skills': len(resume_skills)
+            }
+
+        # SEMANTIC MATCHING (Decision #7)
+        # Threshold: 0.65 based on Experiment #7 results
+        threshold = 0.65
+
+        # Generate embeddings using EmbeddingGemma
+        resume_embeddings = self.embedding_generator.model.encode(resume_skills)
+        job_embeddings = self.embedding_generator.model.encode(job_skills)
+
+        matched = []
+        missing = []
+        matched_resume_indices = set()
+
+        # For each job skill, find best matching resume skill
+        for job_idx, job_skill in enumerate(job_skills):
+            job_emb = job_embeddings[job_idx]
+
+            best_score = 0
+            best_match_idx = -1
+
+            for resume_idx, resume_skill in enumerate(resume_skills):
+                resume_emb = resume_embeddings[resume_idx]
+
+                # Cosine similarity
+                similarity = np.dot(job_emb, resume_emb) / (
+                    np.linalg.norm(job_emb) * np.linalg.norm(resume_emb)
+                )
+
+                if similarity > best_score:
+                    best_score = similarity
+                    best_match_idx = resume_idx
+
+            # Match if above threshold
+            if best_score >= threshold:
+                matched.append(job_skill)
+                matched_resume_indices.add(best_match_idx)
+            else:
+                missing.append(job_skill)
+
+        # Extra skills = resume skills not matched
+        extra = [s for idx, s in enumerate(resume_skills) if idx not in matched_resume_indices]
 
         match_pct = (len(matched) / len(job_skills) * 100) if job_skills else 0.0
 
         return {
-            'matched_skills': sorted(list(matched)),
-            'missing_skills': sorted(list(missing)),
-            'extra_skills': sorted(list(extra)),
+            'matched_skills': sorted(matched),
+            'missing_skills': sorted(missing),
+            'extra_skills': sorted(extra),
             'match_percentage': round(match_pct, 1),
             'total_job_skills': len(job_skills),
             'total_resume_skills': len(resume_skills)

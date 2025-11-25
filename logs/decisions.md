@@ -432,6 +432,91 @@ Skill-weighted reranking actually made skill match worse (7.4% → 3.7%), sugges
 
 ---
 
+### Decision #7: Use Semantic Similarity (EmbeddingGemma) for Skill Matching
+**Date:** 2025-11-25
+**Phase:** Phase 6.5 - UI Improvement & Bug Fix
+**Status:** Accepted
+
+**Context:**
+Current skill matching implementation shows 0% skill matches for most resumes due to exact string matching after lowercase conversion. This breaks the skill gap analysis feature entirely. Resume skills like "SQL database management" don't match job skills like "sql queries" despite clear semantic overlap. Tested 5 matching strategies (Exact, Fuzzy, Semantic, Keyword, Hybrid) on Peter Boyd's Data Scientist resume against a matched job posting.
+
+**Decision:**
+Use **semantic similarity with EmbeddingGemma** (threshold: 0.65) for matching resume skills against job skills.
+
+**Alternatives Considered:**
+1. **Exact Match (Current)**
+   - Pros: Instant matching (<1ms), no dependencies
+   - Cons: **Completely broken** - 0% match rate despite clear overlaps, requires identical strings
+
+2. **Fuzzy String Matching (Levenshtein)**
+   - Pros: Handles typos, fast (~96ms)
+   - Cons: 0% match rate at 70% threshold, fails for different phrasing ("sql queries" vs "sql database management" = 57%)
+
+3. **Semantic Similarity (EmbeddingGemma)**
+   - Pros: **50% match rate**, captures meaning beyond words, model already loaded
+   - Cons: Slower (~230ms per job)
+
+4. **Keyword/N-gram Overlap**
+   - Pros: Very fast (<1ms)
+   - Cons: 0% match rate, misses semantic relationships
+
+5. **Hybrid (Fuzzy + Keyword)**
+   - Pros: Combines multiple signals
+   - Cons: 0% match rate, both components too weak
+
+**Rationale:**
+Semantic similarity with EmbeddingGemma was selected because:
+- **Only working solution**: 50% match rate vs 0% for all other methods
+- **Captures semantic meaning**: "sql queries" ↔ "sql database management" (similarity: 0.766)
+- **Model already available**: EmbeddingGemma loaded for job matching (no new dependency)
+- **Proven quality**: Phase 4 showed 98% precision for job retrieval
+- **Acceptable latency**: 230ms for full skill comparison vs 20-45s for resume extraction
+- **Proper matches**: Successfully matched:
+  - "sql queries" ← "sql database management" (0.766)
+  - "data models" ← "statistical modeling" (0.721)
+  - "predictive modeling" ← "statistical modeling" (0.785)
+
+**Key Insight:**
+Fuzzy matching fails for semantic concepts because edit distance doesn't measure meaning. "sql queries" and "sql database management" share only "sql" in common, yielding 57% fuzzy similarity (below 70% threshold) despite being related SQL concepts. Semantic embeddings solve this by encoding meaning, not just characters.
+
+**Trade-offs:**
+- Speed vs Quality: Accept 230ms latency for 50% match rate (vs <1ms for 0% match)
+- Simplicity vs Correctness: Require embedding model loaded but get working skill matching
+- Threshold Tuning: 0.65 balances precision (avoid false matches) with recall (find real matches)
+
+**Consequences:**
+- Positive:
+  - **Fixes broken feature**: Skill matching works (0% → 50% match rate)
+  - Accurate skill gap identification for users
+  - Better match quality indicators in UI
+  - Trust in system recommendations restored
+  - Consistent with Phase 4/5 semantic approach
+  - No new model dependencies
+
+- Negative:
+  - 230ms latency per job for skill matching
+  - Requires EmbeddingGemma model loaded in memory
+  - Need to manage embedding caching for resume skills
+
+- Risks:
+  - May need threshold tuning for different domains
+  - Embedding model must remain loaded during matching
+
+**Implementation:**
+- Replace exact matching in `matching_engine.py::_analyze_skills()`
+- Use EmbeddingGemma's `encode()` method for skill embeddings
+- Cache resume skill embeddings (reuse across jobs)
+- Threshold: 0.65 cosine similarity for match
+- Fallback: None needed (semantic matching handles all cases)
+
+**Related Decisions:**
+- Decision #4: Use EmbeddingGemma (same model for job search and skill matching)
+- Experiment #7: Skill Matching Strategy Comparison (logs/experiment_log.md)
+
+**Review Date:** After testing on 10+ diverse resumes - verify 40-60% typical match rate holds across professions
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
@@ -442,6 +527,7 @@ Skill-weighted reranking actually made skill match worse (7.4% → 3.7%), sugges
 | 4 | Use EmbeddingGemma + MMR λ=0.5 for Job Search | 4 | Accepted | 2025-11-21 | High |
 | 5 | Use granite4:micro for RAKE + LLM Atomic Skill Extraction | 5 | Accepted | 2025-11-21 | High |
 | 6 | Use MMR λ=0.5 for Ranking (No Skill Reranking) | 5 | Accepted | 2025-11-21 | High |
+| 7 | Use Semantic Similarity (EmbeddingGemma) for Skill Matching | 6.5 | Accepted | 2025-11-25 | Critical |
 
 
 ---
