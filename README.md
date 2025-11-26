@@ -654,7 +654,7 @@ Contributions welcome! Please:
 
 ## 📝 License
 
-to be added
+MIT license
 
 ---
 
