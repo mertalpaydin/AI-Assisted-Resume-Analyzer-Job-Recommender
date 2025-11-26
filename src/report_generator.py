@@ -21,6 +21,57 @@ from skill_gap_analyzer import SkillGapResult, SkillGapAnalyzer
 logger = logging.getLogger(__name__)
 
 
+def parse_location(location) -> str:
+    """Parse location from dict or string format."""
+    if isinstance(location, dict):
+        # Priority 1: Use formatted if available and non-empty
+        if location.get('formatted') and location['formatted'].strip():
+            return location['formatted'].strip()
+
+        # Priority 2: Use addressLine if available (often contains "Remote" or full address)
+        if location.get('addressLine') and location['addressLine'].strip():
+            addr = location['addressLine'].strip()
+            if addr.lower() not in ['', 'null', 'none']:
+                return addr
+
+        # Priority 3: Build from city, state, country
+        parts = []
+
+        # Check if city is "Remote" (special case)
+        city = location.get('city', '').strip()
+        if city and city.lower() == 'remote':
+            return 'Remote'
+
+        # Build location from components
+        if city:
+            parts.append(city)
+
+        state = location.get('state', '').strip()
+        if state:
+            parts.append(state.upper() if len(state) == 2 else state)
+
+        # Only add country if it's not US (assume US is default)
+        country = location.get('country', '').strip()
+        if country and country.upper() != 'US':
+            parts.append(country.upper())
+
+        if parts:
+            return ', '.join(parts)
+
+        # Last resort: check for any non-empty field
+        for key in ['district', 'county', 'quarter']:
+            val = location.get(key, '').strip()
+            if val:
+                return val
+
+        return 'Location not specified'
+
+    elif isinstance(location, str):
+        return location.strip() if location and location.strip() else 'Location not specified'
+
+    return 'Location not specified'
+
+
 @dataclass
 class RecommendationResult:
     """
@@ -102,7 +153,7 @@ class ReportGenerator:
                 job_id=match.job.job_id,
                 job_title=match.job.title,
                 company=match.job.company,
-                location=match.job.location or "Not specified",
+                location=parse_location(match.job.location) if match.job.location else "Not specified",
                 similarity_score=round(match.similarity_score, 3),
                 skill_match_percentage=match_pct,
                 matched_skills=matched[:10],  # Top 10
@@ -214,8 +265,7 @@ class ReportGenerator:
             'total_jobs_searched': report.total_jobs_searched,
             'search_time_seconds': report.search_time_seconds,
             'recommendations': [asdict(r) for r in report.recommendations],
-            'skill_profile_summary': report.skill_profile_summary,
-            'development_recommendations': report.development_recommendations
+            'skill_profile_summary': report.skill_profile_summary
         }
         return json.dumps(data, indent=2)
 
@@ -248,19 +298,11 @@ class ReportGenerator:
                 f"",
                 f"**Missing Skills:** {', '.join(rec.missing_skills[:5])}",
                 f"",
-                f"_{rec.reasoning}_",
+                f"*{rec.reasoning}*",
                 f"",
                 f"---",
                 f""
             ])
-
-        if report.development_recommendations:
-            lines.extend([
-                f"## Skill Development Recommendations",
-                f""
-            ])
-            for rec in report.development_recommendations:
-                lines.append(f"- {rec}")
 
         return "\n".join(lines)
 
@@ -315,18 +357,6 @@ class ReportGenerator:
             <strong>Missing:</strong> {missing_tags}
         </div>
         <p class="reasoning">{rec.reasoning}</p>
-    </div>
-"""
-
-        if report.development_recommendations:
-            html += """
-    <h2>Skill Development Recommendations</h2>
-    <div class="recommendations">
-        <ul>
-"""
-            for rec in report.development_recommendations:
-                html += f"            <li>{rec}</li>\n"
-            html += """        </ul>
     </div>
 """
 

@@ -77,18 +77,18 @@ This project combines state-of-the-art NLP techniques with local LLMs and semant
 ### Technology Stack
 
 **Core Dependencies:**
-- **LangChain**: PDF parsing and LLM orchestration
-- **Ollama**: Local LLM inference (Granite 4 Micro, Llama 3.2 3B, Gemma 3 4B)
-- **sentence-transformers**: Embedding generation (EmbeddingGemma, All-MiniLM, etc.)
-- **FAISS**: Vector similarity search and indexing
-- **spaCy**: NLP preprocessing, tokenization, lemmatization
-- **KeyBERT**: Semantic keyword and skill extraction
-- **scikit-learn**: Cosine similarity baseline and ML utilities
-- **Streamlit** (optional): Interactive web UI
+- **LangChain**: PDF parsing (PDFPlumber + PyPDF dual-parser pipeline)
+- **Ollama**: Local LLM inference - **gemma3:4b** (resume & job skill extraction)
+- **sentence-transformers**:
+  - **EmbeddingGemma** (google/embeddinggemma-300m) - Document embeddings
+  - **all-MiniLM-L6-v2** - Skill similarity matching
+- **FAISS**: Vector similarity search with MMR (λ=0.5)
+- **Streamlit**: Interactive web UI with smart caching
+- **Plotly**: Interactive visualizations
 
 **Data & Format:**
 - **Input**: English-only PDF resumes
-- **Reference Data**: US Job Postings dataset (2023-05-05) in JSON format
+- **Reference Data**: US Job Postings dataset (2023-05-05, 220K+ jobs) in JSON format
 - **Output**: Structured JSON, Markdown reports, HTML visualizations
 
 ---
@@ -139,28 +139,32 @@ uv run python verify_setup.py
 
 ### Running the Pipeline
 
-**Option 1: Command Line**
+**Streamlit UI (Recommended)**
 ```bash
-python -m src.main --resume path/to/resume.pdf --top-k 10 --output results.json
+streamlit run app.py
 ```
 
-**Option 2: Streamlit UI (Optional)**
-```bash
-streamlit run src/app.py
-```
+Then:
+1. Upload your resume PDF
+2. Adjust slider for number of matches (5-20)
+3. View results in 4 tabs: Overview, Job Matches, Skills Analysis, Export
 
-**Option 3: Python API**
+**Python API**
 ```python
-from src.pipeline import ResumeMatcher
+from src.matching_engine import MatchingEngine
+from pathlib import Path
 
-matcher = ResumeMatcher(
-    job_data_path="data/job_postings.json",
-    embedding_model="sentence-transformers/all-MiniLM-L6-v2",
-    llm_model="llama3.2:3b"
-)
+# Initialize engine
+engine = MatchingEngine(embeddings_path="data/embeddings")
 
-results = matcher.match_resume("path/to/resume.pdf", top_k=10)
-print(results)
+# Match resume
+result = engine.match_resume_pdf(Path("resume.pdf"), top_k=10)
+
+# Access results
+for match in result.matches:
+    print(f"{match.rank}. {match.job.title} at {match.job.company}")
+    print(f"   Similarity: {match.similarity_score:.2%}")
+    print(f"   Skill Match: {match.skill_match['match_percentage']:.0f}%")
 ```
 
 ---
@@ -353,34 +357,64 @@ Identifies skill overlaps and gaps between candidate and job requirements.
 
 Three models tested via Ollama for resume parsing:
 
-| Model               | Size   | Speed       | Accuracy  | Best For                             |
-| ------------------- | ------ | ----------- | --------- | ------------------------------------ |
-| **Granite 4 Micro** | ~2.1GB | ⚡ Very Fast | Good      | Fast iteration, resource-constrained |
-| **Llama 3.2 3B**    | ~2.0GB | ⚡ Fast      | Very Good | Balanced speed/quality               |
-| **Gemma 3 4B**      | ~3.3GB | Medium      | Excellent | High-quality extraction              |
+| Model               | Size   | Speed       | Accuracy  | Best For                             | Selected |
+| ------------------- | ------ | ----------- | --------- | ------------------------------------ | -------- |
+| **Granite 4 Micro** | ~2.1GB | ⚡ Very Fast | Good      | Fast iteration, resource-constrained | |
+| **Llama 3.2 3B**    | ~2.0GB | ⚡ Fast      | Very Good | Balanced speed/quality               | |
+| **Gemma 3 4B**      | ~3.3GB | Medium      | Excellent | High-quality extraction              | ✅ |
 
-**Recommendation:** See `/logs/experiment_log.md` for detailed performance metrics and recommendations.
+**Selected:** **gemma3:4b** for both resume AND job skill extraction (100% extraction accuracy, consistent output)
+
+**Key Learnings:**
+- gemma3:4b: Perfect accuracy (100%), handles complex edge cases, worth the extra latency
+- Larger models produce more granular skills ("classification", "regression" vs just "machine learning")
+- LLM-only extraction cleaner than hybrid approaches (RAKE adds noise)
+
+See `/logs/experiment_log.md` for detailed performance metrics.
 
 ### Embedding Model Comparison
 
-Tested multiple sentence-transformers models for semantic similarity:
+Tested multiple sentence-transformers models on 500 jobs (3627 chunks):
 
-- EmbeddingGemma (specified baseline)
-- all-MiniLM-L6-v2 (32M params, fast)
-- all-mpnet-base-v2 (109M params, high quality)
+| Model | Precision@10 | Speed | Memory | Selected |
+|-------|--------------|-------|--------|----------|
+| all-MiniLM-L6-v2 | 85.0% | 1489/s | 5.31 MB | (Skill matching) |
+| all-mpnet-base-v2 | 86.0% | 242/s | 10.63 MB | |
+| **google/embeddinggemma-300m** | **98.0%** | 147/s | 10.63 MB | ✅ |
 
-**Evaluation Metrics:** Speed, memory usage, embedding quality, downstream matching accuracy
+**Selected:** **EmbeddingGemma** for document embeddings (98% precision, 12-13% better than alternatives)
+
+**Key Finding:** EmbeddingGemma uses asymmetric encoding (encode_query vs encode_document) optimized for retrieval tasks
 
 ### Similarity Search Methods
 
-Compared four approaches for job recommendation:
+Tested retrieval strategies on real data:
 
-1. **Cosine Similarity (Baseline)** - Simple, interpretable, good baseline
-2. **FAISS IndexFlatL2** - Scales better, maintains accuracy
-3. **FAISS IndexIVFFlat** - Approximate search for large-scale deployment
-4. **Maximum Marginal Relevance** - Diverse, non-redundant recommendations
+| Strategy | Precision | Companies | Categories | Selected |
+|----------|-----------|-----------|------------|----------|
+| Cosine | 0.850 | 9.5/10 | 3.5 | |
+| MMR λ=0.3 | 0.850 | 9.9/10 | 3.7 | |
+| **MMR λ=0.5** | **0.880** | 9.9/10 | 3.8 | ✅ |
+| MMR λ=0.7 | 0.840 | 9.9/10 | 3.6 | |
 
-**Trade-offs:** See `/logs/decisions.md` for rationale and performance comparisons.
+**Selected:** **MMR λ=0.5** - highest precision (0.880) with maximum diversity (9.9/10 unique companies)
+
+**Key Learning:** MMR actually improved precision (not just diversity) by reducing redundant results
+
+### Skill Matching Strategy
+
+**Critical Decision:** Switched from exact string matching to **semantic similarity** (Phase 6.5)
+
+| Method | Avg Skill Match | Matched Skills | Selected |
+|--------|----------------|----------------|----------|
+| Exact String Match | 0.0% | 0 | ❌ (Broken) |
+| **Semantic Similarity (threshold=0.5)** | **37.6%** | 2-5 per job | ✅ |
+
+**Model:** all-MiniLM-L6-v2 (fast, accurate for short skill phrases)
+
+**Example:** "SQL database management" ↔ "sql queries" (0.65 similarity) ✅ Matched
+
+See `/logs/decisions.md` for detailed rationale and `/logs/experiment_log.md` for all experiments.
 
 ---
 
@@ -388,11 +422,11 @@ Compared four approaches for job recommendation:
 
 ### Success Criteria
 
-- ✅ Resume parsing accuracy: **>90%** field extraction
-- ✅ Skill extraction: **>85%** precision and recall
-- ✅ Recommendation relevance: Manual validation shows high-quality matches
-- ✅ End-to-end latency: **<5 seconds** per resume
-- ✅ Production-grade code: Full test coverage, comprehensive logging
+- ✅ Resume parsing accuracy: **100%** (gemma3:4b with dual-parser fallback)
+- ✅ Skill extraction: gemma3:4b produces atomic, technical skills
+- ✅ Skill matching: **37.6% avg** with semantic similarity (was 0% with exact match)
+- ✅ Recommendation relevance: MMR λ=0.5 achieves 88% precision with max diversity
+- ✅ Production-grade code: Comprehensive logging, error handling, graceful fallbacks
 
 ### Sample Output
 
@@ -437,25 +471,26 @@ Compared four approaches for job recommendation:
 Edit `src/utils/config.py` to customize:
 
 ```python
-# LLM Configuration
-LLM_MODEL = "llama3.2:3b"  # Options: granite4:micro, llama3.2:3b, gemma3:4b
-LLM_TEMPERATURE = 0.7
+# LLM Configuration (Ollama)
+LLM_MODEL = "gemma3:4b"  # Selected for 100% accuracy
+LLM_TEMPERATURE = 0.1  # Low temp for consistent extraction
 
 # Embedding Configuration
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-EMBEDDING_BATCH_SIZE = 32
+EMBEDDING_MODEL_DOCUMENTS = "google/embeddinggemma-300m"  # 98% precision
+EMBEDDING_MODEL_SKILLS = "sentence-transformers/all-MiniLM-L6-v2"  # Skill matching
+EMBEDDING_DIM = 768
 
 # Search Configuration
-SEARCH_METHOD = "mmr"  # Options: cosine, faiss_flat, faiss_ivf, mmr
-TOP_K_RESULTS = 10
-MMR_LAMBDA = 0.5  # Relevance vs. diversity trade-off
+SEARCH_METHOD = "mmr"  # Always enabled (best results)
+TOP_K_DEFAULT = 5  # Initial load
+TOP_K_MAX = 20  # Slider maximum
+MMR_LAMBDA = 0.5  # Balanced relevance/diversity
 
-# Preprocessing
-REMOVE_STOPWORDS = True
-NORMALIZE_SKILLS = True
+# Skill Matching
+SKILL_SIMILARITY_THRESHOLD = 0.5  # Semantic matching threshold
 
 # Output
-OUTPUT_FORMAT = "json"  # Options: json, markdown, html
+OUTPUT_FORMATS = ["json", "markdown", "html"]
 ```
 
 ---
@@ -550,6 +585,8 @@ See `/docs/deployment_guide.md` for detailed deployment instructions.
 
 ## 🔮 Future Enhancements
 
+- [ ] **Speed Optimizations** - Extraction speeds is relatively slow, find ways to improve it
+- [ ] **AI Suggestions** - Add ollama and Gemini API suggestions for extracted matches
 - [ ] **Multi-language Support** - Extend beyond English
 - [ ] **OCR - Non-text PDF integration** - Integrate an OCR model for PDF parsing
 

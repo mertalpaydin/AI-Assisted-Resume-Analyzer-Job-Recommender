@@ -1,0 +1,213 @@
+2025-11-26 10:11:17,067 - INFO - Initializing MatchingEngine...
+10:11:17 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+2025-11-26 10:11:17,067 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+10:11:17 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+2025-11-26 10:11:17,067 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+10:11:17 - INFO - ResumeExtractor initialized successfully
+2025-11-26 10:11:17,368 - INFO - ResumeExtractor initialized successfully
+2025-11-26 10:11:17,369 - INFO - Use pytorch device_name: cuda:0
+2025-11-26 10:11:17,370 - INFO - Load pretrained SentenceTransformer: google/embeddinggemma-300m
+2025-11-26 10:11:23,538 - INFO - 14 prompts are loaded, with the keys: ['query', 'document', 'BitextMining', 'Clustering', 'Classification', 'InstructionRetrieval', 'MultilabelClassification', 'PairClassification', 'Reranking', 'Retrieval', 'Retrieval-query', 'Retrieval-document', 'STS', 'Summarization']
+2025-11-26 10:11:23,538 - INFO - Loaded model google/embeddinggemma-300m with dimension 768
+2025-11-26 10:11:23,538 - INFO - ChunkEmbeddingGenerator initialized with google/embeddinggemma-300m (dim=768)
+2025-11-26 10:11:23,538 - INFO - Initializing SkillExtractor
+2025-11-26 10:11:23,766 - INFO - spaCy model en_core_web_sm loaded successfully
+2025-11-26 10:11:23,766 - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-26 10:11:23,766 - INFO - SkillExtractor initialized (top_n=30, diversity=0.5)
+2025-11-26 10:11:23,771 - INFO - Loading faiss with AVX2 support.
+2025-11-26 10:11:23,791 - INFO - Successfully loaded faiss with AVX2 support.
+2025-11-26 10:11:23,796 - INFO - Created FAISS flat index
+2025-11-26 10:11:23,797 - INFO - ChunkVectorStore initialized: dim=768, type=flat
+2025-11-26 10:11:23,797 - INFO - JobIDMapper initialized
+2025-11-26 10:11:24,236 - INFO - Vector store loaded from data\embeddings: 220902 vectors
+2025-11-26 10:11:37,294 - INFO - Loaded 220902 job embeddings
+2025-11-26 10:11:37,294 - INFO - Loaded 33064 jobs
+2025-11-26 10:11:37,294 - INFO - MatchingEngine initialized successfully
+10:11:37 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+2025-11-26 10:11:37,294 - INFO - Initializing ResumeExtractor with model: gemma3:4b
+10:11:37 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+2025-11-26 10:11:37,295 - INFO - PDFResumeParser initialized with default loader: pdfplumber
+10:11:37 - INFO - ResumeExtractor initialized successfully
+2025-11-26 10:11:37,605 - INFO - ResumeExtractor initialized successfully
+10:11:37 - INFO - Extracting resume from PDF: Resume - Data Scientist.pdf
+2025-11-26 10:11:37,605 - INFO - Extracting resume from PDF: Resume - Data Scientist.pdf
+10:11:37 - INFO - Dual-parser mode: ENABLED
+2025-11-26 10:11:37,605 - INFO - Dual-parser mode: ENABLED
+10:11:37 - INFO - Step 1: Parsing PDF with PDFPlumber...
+2025-11-26 10:11:37,605 - INFO - Step 1: Parsing PDF with PDFPlumber...
+10:11:37 - INFO - Parsing with PDFPlumber: Resume - Data Scientist.pdf
+2025-11-26 10:11:37,605 - INFO - Parsing with PDFPlumber: Resume - Data Scientist.pdf
+10:11:39 - INFO - PDFPlumber success: 1 pages, 184 words, 1.50s
+2025-11-26 10:11:39,105 - INFO - PDFPlumber success: 1 pages, 184 words, 1.50s
+10:11:39 - INFO - PDFPlumber parsed: 1358 characters
+2025-11-26 10:11:39,105 - INFO - PDFPlumber parsed: 1358 characters
+10:11:39 - INFO - Step 2: Extracting structured data with LLM (first pass - PDFPlumber)...
+2025-11-26 10:11:39,105 - INFO - Step 2: Extracting structured data with LLM (first pass - PDFPlumber)...
+10:11:39 - INFO - Sending to LLM...
+2025-11-26 10:11:39,105 - INFO - Sending to LLM...
+2025-11-26 10:11:45,339 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+10:11:51 - INFO - LLM response received in 12.86s
+2025-11-26 10:11:51,966 - INFO - LLM response received in 12.86s
+10:11:51 - INFO - Resume successfully parsed and validated
+2025-11-26 10:11:51,966 - INFO - Resume successfully parsed and validated
+10:11:51 - INFO - First pass extraction successful
+2025-11-26 10:11:51,966 - INFO - First pass extraction successful
+10:11:51 - INFO - Step 3: Parsing PDF with PyPDF (second parser)...
+2025-11-26 10:11:51,966 - INFO - Step 3: Parsing PDF with PyPDF (second parser)...
+10:11:51 - INFO - Parsing with PyPDF: Resume - Data Scientist.pdf
+2025-11-26 10:11:51,966 - INFO - Parsing with PyPDF: Resume - Data Scientist.pdf
+10:11:52 - INFO - PyPDF success: 1 pages, 1173 words, 0.09s
+2025-11-26 10:11:52,057 - INFO - PyPDF success: 1 pages, 1173 words, 0.09s
+10:11:52 - INFO - PyPDF parsed: 2485 characters
+2025-11-26 10:11:52,057 - INFO - PyPDF parsed: 2485 characters
+10:11:52 - INFO - Step 4: Refining extraction with LLM (second pass - PyPDF)...
+2025-11-26 10:11:52,057 - INFO - Step 4: Refining extraction with LLM (second pass - PyPDF)...
+10:11:52 - INFO - Sending refinement request to LLM...
+2025-11-26 10:11:52,059 - INFO - Sending refinement request to LLM...
+2025-11-26 10:11:53,510 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+10:12:02 - INFO - LLM refinement response received in 10.13s
+2025-11-26 10:12:02,189 - INFO - LLM refinement response received in 10.13s
+10:12:02 - INFO - Refined resume successfully parsed and validated
+2025-11-26 10:12:02,189 - INFO - Refined resume successfully parsed and validated
+10:12:02 - INFO - Resume extraction successful in 24.58s (dual-parser mode)
+2025-11-26 10:12:02,189 - INFO - Resume extraction successful in 24.58s (dual-parser mode)
+2025-11-26 10:12:02,189 - INFO - Generating resume embedding...
+================================================================================
+JOB SKILL EXTRACTION METHOD COMPARISON
+================================================================================
+
+Loading test job posting...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  1.70it/s]Batches: 100%|##########| 1/1 [00:00<00:00,  1.70it/s]
+2025-11-26 10:12:02,793 - INFO - Searching for top 5 matching jobs...
+2025-11-26 10:12:02,872 - INFO - Found 5 job matches in 0.68s
+2025-11-26 10:12:02,872 - INFO - Initializing SkillExtractor
+2025-11-26 10:12:03,104 - INFO - spaCy model en_core_web_sm loaded successfully
+2025-11-26 10:12:03,104 - INFO - SkillNormalizer initialized with 80 canonical skills
+2025-11-26 10:12:03,104 - INFO - SkillExtractor initialized (top_n=20, diversity=0.5)
+2025-11-26 10:12:04,749 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:05,504 - INFO -   Run 1/4: 2.07s, 8 skills
+2025-11-26 10:12:06,437 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:07,137 - INFO -   Run 2/4: 1.63s, 8 skills
+2025-11-26 10:12:08,042 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:08,740 - INFO -   Run 3/4: 1.60s, 8 skills
+2025-11-26 10:12:09,683 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:10,391 - INFO -   Run 4/4: 1.65s, 8 skills
+2025-11-26 10:12:14,673 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:14,852 - INFO -   Run 1/4: 4.12s, 3 skills
+2025-11-26 10:12:15,114 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:15,284 - INFO -   Run 2/4: 0.43s, 3 skills
+2025-11-26 10:12:15,559 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:15,731 - INFO -   Run 3/4: 0.45s, 3 skills
+2025-11-26 10:12:16,000 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:16,173 - INFO -   Run 4/4: 0.44s, 3 skills
+2025-11-26 10:12:16,195 - INFO -   RAKE extracted 30 candidates
+2025-11-26 10:12:16,846 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:17,329 - INFO -   Run 1/4: 0.81s, 7 skills
+2025-11-26 10:12:17,644 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:18,119 - INFO -   Run 2/4: 0.79s, 7 skills
+2025-11-26 10:12:18,388 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:18,862 - INFO -   Run 3/4: 0.74s, 7 skills
+2025-11-26 10:12:19,145 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2025-11-26 10:12:19,624 - INFO -   Run 4/4: 0.76s, 7 skills
+
+[TEST JOB]
+Title: Data Science Intern (2023)
+Company: 1010data
+Description length: 2501 chars
+
+================================================================================
+METHOD 1: gemma3:4b (LLM Only)
+================================================================================
+
+================================================================================
+METHOD 2: granite4:micro (LLM Only)
+================================================================================
+
+================================================================================
+METHOD 3: RAKE -> granite4:micro (Hybrid)
+================================================================================
+
+================================================================================
+RESULTS SUMMARY
+================================================================================
+
+Method: gemma3:4b
+Average Latency: 1.63s (excluding 1st run)
+Latencies: ['2.07s', '1.63s', '1.60s', '1.65s']
+Skills Count: 8
+Extracted Skills:
+  - python
+  - sql
+  - machine learning
+  - classification
+  - regression
+  - clustering
+  - databases
+  - data types
+
+--------------------------------------------------------------------------------
+
+Method: granite4:micro
+Average Latency: 0.44s (excluding 1st run)
+Latencies: ['4.12s', '0.43s', '0.45s', '0.44s']
+Skills Count: 3
+Extracted Skills:
+  - python
+  - sql
+  - machine learning
+
+--------------------------------------------------------------------------------
+
+Method: RAKE -> granite4:micro
+Average Latency: 0.76s (excluding 1st run)
+Latencies: ['0.81s', '0.79s', '0.74s', '0.76s']
+Skills Count: 7
+Extracted Skills:
+  - programming languages
+  - technologies and frameworks
+  - tools and platforms
+  - technical methodologies
+  - data science
+  - database skills
+  - computer science
+
+RAKE Candidates (first 15):
+  - 1010data welcomes current college students looking
+  - june 5th start date
+  - improve data consistency within
+  - fully remote work environment
+  - one additional team member
+  - improve trend validity
+  - begin june 5
+  - recruiting team member
+  - similar technical skills
+  - multiple clients regarding
+  - market insights line
+  - end august 4
+  - basic database concepts
+  - team members across
+  - reduce manual work
+
+--------------------------------------------------------------------------------
+
+[SAVED] Results saved to: C:\Users\merta\OneDrive\Desktop\FS Courses\Personal Development\AI_Assisted_Resume_Analyzer_Job_Recommender\experiments\results\job_skill_extraction_comparison.json
+
+================================================================================
+COMPARISON TABLE
+================================================================================
+
+Method                         Latency      Skills     Quality
+--------------------------------------------------------------------------------
+gemma3:4b                      1.63s        8          [Review Below]
+granite4:micro                 0.44s        3          [Review Below]
+RAKE -> granite4:micro         0.76s        7          [Review Below]
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Review the extracted skills for each method
+2. Evaluate quality: Are they technical skills? Any noise?
+3. Consider latency trade-off
+4. Decide together which method to use
+

@@ -95,6 +95,29 @@ class ResumeExtractor:
 
         logger.info("ResumeExtractor initialized successfully")
 
+    def _clean_resume_dict(self, resume_dict: dict) -> dict:
+        """
+        Clean resume dictionary by filtering out None values from list fields.
+
+        Args:
+            resume_dict: Raw resume dictionary from LLM
+
+        Returns:
+            Cleaned resume dictionary
+        """
+        # List fields that should not contain None values
+        list_fields = ['skills', 'certifications', 'languages', 'projects', 'awards', 'publications']
+
+        for field in list_fields:
+            if field in resume_dict and isinstance(resume_dict[field], list):
+                # Filter out None values and empty strings
+                resume_dict[field] = [
+                    item for item in resume_dict[field]
+                    if item is not None and (not isinstance(item, str) or item.strip())
+                ]
+
+        return resume_dict
+
     def _create_prompt_template(self) -> PromptTemplate:
         """
         Create the prompt template for resume extraction.
@@ -394,6 +417,9 @@ JSON OUTPUT:
                     # Parse JSON
                     resume_dict = json.loads(json_text)
 
+                    # Clean None values from list fields
+                    resume_dict = self._clean_resume_dict(resume_dict)
+
                     # Validate with Pydantic
                     refined_resume = Resume(**resume_dict)
 
@@ -496,6 +522,9 @@ JSON OUTPUT:
 
                     # Parse JSON
                     resume_dict = json.loads(json_text)
+
+                    # Clean None values from list fields
+                    resume_dict = self._clean_resume_dict(resume_dict)
 
                     # Validate with Pydantic
                     resume = Resume(**resume_dict)

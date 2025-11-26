@@ -517,17 +517,104 @@ Fuzzy matching fails for semantic concepts because edit distance doesn't measure
 
 ---
 
+### Decision #8: Use gemma3:4b for Job Skill Extraction
+**Date:** 2025-11-26
+**Phase:** Phase 6.5 - Skill Quality Improvement
+**Status:** Accepted
+
+**Context:**
+Current job skill extraction uses RAKE → granite4:micro pipeline (Decision #5), but produces poor quality results:
+- Extracts generic category names ("programming languages", "technologies and frameworks") instead of actual skills
+- Includes recruitment noise ("june 5th start date", "fully remote work environment")
+- Missing specific technical requirements
+- Example output: ["programming languages", "data science", "computer science"] instead of ["python", "sql", "machine learning"]
+
+CV extraction uses gemma3:4b directly with excellent results (8 specific skills). Need to improve job skill extraction to match CV quality for better skill matching.
+
+**Decision:**
+Use **gemma3:4b** (direct LLM extraction) for job skill extraction, replacing RAKE → granite4:micro pipeline.
+
+**Alternatives Considered:**
+
+1. **gemma3:4b (Direct LLM)**
+   - Pros: 8 specific, atomic skills (python, sql, machine learning, classification, regression, clustering, databases, data types), no noise, consistent quality
+   - Cons: 1.63s average latency (2.1x slower than RAKE hybrid)
+
+2. **granite4:micro (Direct LLM)**
+   - Pros: Fastest (0.44s), valid skills
+   - Cons: Too few skills (only 3: python, sql, machine learning), misses important concepts (regression, clustering, databases)
+
+3. **RAKE → granite4:micro (Current Pipeline)**
+   - Pros: Moderate speed (0.76s)
+   - Cons: **Unusable quality** - generic categories instead of skills, RAKE noise ("june 5th start date"), 7 generic terms vs 0 actual skills
+
+**Rationale:**
+gemma3:4b selected for job skill extraction because:
+- **Best quality**: 8 specific, atomic technical skills vs 3 (granite4:micro) or 0 usable (RAKE hybrid)
+- **No noise**: Zero generic categories, recruitment language, or soft skills
+- **Acceptable speed**: 1.63s is reasonable for job matching (vs 20-45s for resume extraction)
+- **Completeness**: Captures both high-level concepts (machine learning) and specific techniques (regression, clustering)
+- **Consistency**: Same model for both CV and job extraction - symmetric pipeline
+- **Better skill matching**: Actual skills enable semantic similarity matching (Decision #7)
+
+**Key Insight:**
+RAKE → LLM fails for job descriptions because:
+- Job ads have different linguistic structure than resumes (marketing language, benefits, dates)
+- RAKE candidates from jobs are too noisy for LLM refinement to work
+- Direct LLM extraction bypasses the noisy intermediate step
+- gemma3:4b (4B params) can distinguish actual skills from recruitment language better than granite4:micro (2B params) refining noisy RAKE output
+
+**Trade-offs:**
+- Speed vs Quality: Accept 1.63s (vs 0.76s) for usable skill extraction (8 specific skills vs 0)
+- Pipeline Consistency: Same model (gemma3:4b) for both CVs and jobs simplifies architecture
+- Method Consistency: Different approaches for CVs (still works well with RAKE) vs jobs (direct LLM)
+
+**Consequences:**
+- Positive:
+  - **Fixes unusable skill extraction**: Generic categories → actual skills
+  - Improved skill match percentages (comparing actual vs actual skills)
+  - Better skill gap analysis (specific missing skills instead of categories like "programming languages")
+  - Improved recommendation quality and user trust
+  - Simpler pipeline (direct LLM vs RAKE → LLM)
+  - Consistent model choice across CV and job extraction
+
+- Negative:
+  - 1.63s latency per job (vs 0.76s), but acceptable within 20-45s total matching time
+  - Additional LLM calls during job matching
+  - gemma3:4b must be available in Ollama
+
+- Risks:
+  - May need prompt tuning for different job posting styles
+  - Latency may become issue if processing very large job databases
+
+**Implementation:**
+- Update `SkillExtractor.extract_skills()` to use gemma3:4b for job descriptions
+- Or create dedicated method `extract_job_skills()` with gemma3:4b
+- Keep RAKE-based extraction for resume skills (still works well)
+- Use same prompt pattern as CV extraction (focus on technical skills, exclude soft skills/benefits)
+
+**Related Decisions:**
+- Decision #1: Use gemma3:4b for Resume Parsing (now also for job skill extraction)
+- Decision #5: Use granite4:micro for RAKE + LLM (superseded for jobs)
+- Decision #7: Use Semantic Similarity for Skill Matching (requires actual skills not categories)
+- Experiment #8: Job Skill Extraction Method Comparison (logs/experiment_log.md)
+
+**Review Date:** After Phase 6.5 completion - verify improved skill match percentages on diverse resumes
+
+---
+
 ## Decision Summary Table
 
 | # | Title | Phase | Status | Date | Impact |
 |---|-------|-------|--------|------|--------|
 | 1 | Select gemma3:4b as Primary LLM for Resume Parsing | 2 | Accepted | 2025-11-18 | High |
 | 2 | Implement Dual-Parser Sequential Pipeline for PDF Extraction | 2 | Accepted | 2025-11-20 | High |
-| 3 | Use RAKE as Primary Skill Extraction Method | 3 | Accepted | 2025-11-20 | High |
+| 3 | Use RAKE as Primary Skill Extraction Method | 3 | Superseded (CVs only) | 2025-11-20 | High |
 | 4 | Use EmbeddingGemma + MMR λ=0.5 for Job Search | 4 | Accepted | 2025-11-21 | High |
-| 5 | Use granite4:micro for RAKE + LLM Atomic Skill Extraction | 5 | Accepted | 2025-11-21 | High |
+| 5 | Use granite4:micro for RAKE + LLM Atomic Skill Extraction | 5 | Superseded | 2025-11-21 | High |
 | 6 | Use MMR λ=0.5 for Ranking (No Skill Reranking) | 5 | Accepted | 2025-11-21 | High |
 | 7 | Use Semantic Similarity (EmbeddingGemma) for Skill Matching | 6.5 | Accepted | 2025-11-25 | Critical |
+| 8 | Use gemma3:4b for Job Skill Extraction | 6.5 | Accepted | 2025-11-26 | High |
 
 
 ---

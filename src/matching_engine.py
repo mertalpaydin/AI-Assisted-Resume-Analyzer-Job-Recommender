@@ -261,11 +261,9 @@ class MatchingEngine:
         resume_skills_raw = resume.skills
         resume_skills = [s.lower() for s in resume_skills_raw]
 
-        # Extract job skills from description
+        # Extract job skills from description using gemma3:4b (Decision #8)
         job_text = f"{job.title} {job.description}"
-        job_skills_extracted = self.skill_extractor.extract_skills(
-            job_text, method="rake_llm", top_n=10
-        )
+        job_skills_extracted = self.skill_extractor.extract_job_skills_llm(job_text)
         job_skills = [s.lower() for s in job_skills_extracted]
 
         # If either list is empty, return early

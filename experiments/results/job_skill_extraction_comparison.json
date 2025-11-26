@@ -1,0 +1,183 @@
+{
+  "test_date": "2025-11-26 10:12:19",
+  "test_job": {
+    "title": "Data Science Intern (2023)",
+    "company": "1010data",
+    "description_length": 2501
+  },
+  "results": [
+    {
+      "method": "gemma3:4b",
+      "skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "classification",
+        "regression",
+        "clustering",
+        "databases",
+        "data types"
+      ],
+      "latency": 1.6290777524312336,
+      "all_runs": [
+        [
+          "python",
+          "sql",
+          "machine learning",
+          "classification",
+          "regression",
+          "clustering",
+          "databases",
+          "data types"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning",
+          "classification",
+          "regression",
+          "clustering",
+          "databases",
+          "data types"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning",
+          "classification",
+          "regression",
+          "clustering",
+          "databases",
+          "data types"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning",
+          "classification",
+          "regression",
+          "clustering",
+          "databases",
+          "data types"
+        ]
+      ],
+      "all_latencies": [
+        2.071597099304199,
+        1.633681297302246,
+        1.6024806499481201,
+        1.651071310043335
+      ]
+    },
+    {
+      "method": "granite4:micro",
+      "skills": [
+        "python",
+        "sql",
+        "machine learning"
+      ],
+      "latency": 0.44019730885823566,
+      "all_runs": [
+        [
+          "python",
+          "sql",
+          "machine learning"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning"
+        ],
+        [
+          "python",
+          "sql",
+          "machine learning"
+        ]
+      ],
+      "all_latencies": [
+        4.122547388076782,
+        0.43224215507507324,
+        0.4469442367553711,
+        0.4414055347442627
+      ]
+    },
+    {
+      "method": "RAKE -> granite4:micro",
+      "rake_candidates": [
+        "1010data welcomes current college students looking",
+        "june 5th start date",
+        "improve data consistency within",
+        "fully remote work environment",
+        "one additional team member",
+        "improve trend validity",
+        "begin june 5",
+        "recruiting team member",
+        "similar technical skills",
+        "multiple clients regarding",
+        "market insights line",
+        "end august 4",
+        "basic database concepts",
+        "team members across",
+        "reduce manual work"
+      ],
+      "skills": [
+        "programming languages",
+        "technologies and frameworks",
+        "tools and platforms",
+        "technical methodologies",
+        "data science",
+        "database skills",
+        "computer science"
+      ],
+      "latency": 0.764830748240153,
+      "all_runs": [
+        [
+          "programming languages",
+          "technologies and frameworks",
+          "tools and platforms",
+          "technical methodologies",
+          "data science",
+          "database skills",
+          "computer science"
+        ],
+        [
+          "programming languages",
+          "technologies and frameworks",
+          "tools and platforms",
+          "technical methodologies",
+          "data science",
+          "database skills",
+          "computer science"
+        ],
+        [
+          "programming languages",
+          "technologies and frameworks",
+          "tools and platforms",
+          "technical methodologies",
+          "data science",
+          "database skills",
+          "computer science"
+        ],
+        [
+          "programming languages",
+          "technologies and frameworks",
+          "tools and platforms",
+          "technical methodologies",
+          "data science",
+          "database skills",
+          "computer science"
+        ]
+      ],
+      "all_latencies": [
+        0.8056466579437256,
+        0.7897200584411621,
+        0.743053674697876,
+        0.7617185115814209
+      ]
+    }
+  ]
+}

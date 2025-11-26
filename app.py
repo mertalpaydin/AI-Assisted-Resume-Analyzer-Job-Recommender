@@ -107,6 +107,10 @@ if 'matching_report' not in st.session_state:
     st.session_state.matching_report = None
 if 'engine' not in st.session_state:
     st.session_state.engine = None
+if 'cached_top_k' not in st.session_state:
+    st.session_state.cached_top_k = 0  # Track how many jobs were extracted
+if 'uploaded_file_name' not in st.session_state:
+    st.session_state.uploaded_file_name = None  # Track current file
 
 
 # ====================
@@ -188,6 +192,57 @@ def display_resume_summary(resume: Resume):
         st.markdown(skills_html, unsafe_allow_html=True)
 
 
+def parse_location(location):
+    """Parse location from dict or string format."""
+    if isinstance(location, dict):
+        # Priority 1: Use formatted if available and non-empty
+        if location.get('formatted') and location['formatted'].strip():
+            return location['formatted'].strip()
+
+        # Priority 2: Use addressLine if available (often contains "Remote" or full address)
+        if location.get('addressLine') and location['addressLine'].strip():
+            addr = location['addressLine'].strip()
+            if addr.lower() not in ['', 'null', 'none']:
+                return addr
+
+        # Priority 3: Build from city, state, country
+        parts = []
+
+        # Check if city is "Remote" (special case)
+        city = location.get('city', '').strip()
+        if city and city.lower() == 'remote':
+            return 'Remote'
+
+        # Build location from components
+        if city:
+            parts.append(city)
+
+        state = location.get('state', '').strip()
+        if state:
+            parts.append(state.upper() if len(state) == 2 else state)
+
+        # Only add country if it's not US (assume US is default)
+        country = location.get('country', '').strip()
+        if country and country.upper() != 'US':
+            parts.append(country.upper())
+
+        if parts:
+            return ', '.join(parts)
+
+        # Last resort: check for any non-empty field
+        for key in ['district', 'county', 'quarter']:
+            val = location.get(key, '').strip()
+            if val:
+                return val
+
+        return 'Location not specified'
+
+    elif isinstance(location, str):
+        return location.strip() if location and location.strip() else 'Location not specified'
+
+    return 'Location not specified'
+
+
 def display_job_match(match, rank: int):
     """Display a single job match card."""
     job = match.job
@@ -198,7 +253,9 @@ def display_job_match(match, rank: int):
         col1, col2 = st.columns([3, 1])
         with col1:
             st.markdown(f"### {rank}. {job.title}")
-            st.markdown(f"**{job.company}** • {job.location or 'Location not specified'}")
+            # Parse location properly
+            location_str = parse_location(job.location)
+            st.markdown(f"**{job.company}** • {location_str}")
         with col2:
             # Similarity score
             score_pct = match.similarity_score * 100
@@ -238,34 +295,62 @@ def display_job_match(match, rank: int):
                                             for s in skill_data['missing_skills'][:10]])
                     st.markdown(missing_html, unsafe_allow_html=True)
 
-        # Job description (truncated)
+        # Job description (full)
         with st.expander("📝 Job Description"):
-            st.write(job.description[:500] + "..." if len(job.description) > 500 else job.description)
+            st.write(job.description)
+
+        # AI Insights Placeholder (Phase 7)
+        with st.expander("✨ AI Match Insights (Coming in Phase 7)", expanded=False):
+            st.info("🚀 **Coming Soon!**\n\nAI-generated insights will provide:\n- Overall match quality assessment\n- Key strengths for this role\n- Potential concerns or gaps\n- Interview talking points\n\n*This feature will be available in Phase 7*")
 
         st.markdown("---")
 
 
 def create_skill_analysis_chart(report: MatchingReport):
-    """Create skill analysis visualization."""
-    # Extract skill match percentages
-    job_titles = [rec.job_title[:30] + "..." if len(rec.job_title) > 30 else rec.job_title
+    """Create scatter plot showing relationship between similarity and skill match."""
+    # Extract metrics
+    job_titles = [rec.job_title[:40] + "..." if len(rec.job_title) > 40 else rec.job_title
                   for rec in report.recommendations]
     skill_matches = [rec.skill_match_percentage for rec in report.recommendations]
     similarities = [rec.similarity_score * 100 for rec in report.recommendations]
+    companies = [rec.company[:30] for rec in report.recommendations]
 
-    # Create grouped bar chart
-    fig = go.Figure(data=[
-        go.Bar(name='Skill Match %', x=job_titles, y=skill_matches, marker_color='#3498db'),
-        go.Bar(name='Similarity %', x=job_titles, y=similarities, marker_color='#9b59b6')
-    ])
+    # Create DataFrame
+    df = pd.DataFrame({
+        'Job Title': job_titles,
+        'Company': companies,
+        'Similarity %': similarities,
+        'Skill Match %': skill_matches,
+        'Label': [f"{title}<br>{company}" for title, company in zip(job_titles, companies)]
+    })
+
+    # Create scatter plot
+    fig = px.scatter(
+        df,
+        x='Similarity %',
+        y='Skill Match %',
+        hover_data=['Job Title', 'Company'],
+        size=[20] * len(df),  # Fixed size
+        color='Skill Match %',
+        color_continuous_scale='Viridis',
+        title="Match Quality: Similarity vs. Skill Match"
+    )
+
+    # Add quadrant lines (average)
+    avg_sim = sum(similarities) / len(similarities)
+    avg_skill = sum(skill_matches) / len(skill_matches)
+
+    fig.add_hline(y=avg_skill, line_dash="dot", line_color="gray", opacity=0.3,
+                  annotation_text=f"Avg Skill: {avg_skill:.1f}%", annotation_position="right")
+    fig.add_vline(x=avg_sim, line_dash="dot", line_color="gray", opacity=0.3,
+                  annotation_text=f"Avg Similarity: {avg_sim:.1f}%", annotation_position="top")
 
     fig.update_layout(
-        title="Skill Match vs. Similarity Score by Job",
-        xaxis_title="Job Position",
-        yaxis_title="Percentage",
-        barmode='group',
-        height=400,
-        showlegend=True
+        height=500,
+        xaxis_title="Semantic Similarity %",
+        yaxis_title="Skill Match %",
+        showlegend=False
+        # Auto-scale axes (no fixed range)
     )
 
     return fig
@@ -325,16 +410,9 @@ def main():
             "Number of job matches",
             min_value=5,
             max_value=20,
-            value=10,
+            value=5,
             step=1,
             help="How many top matching jobs to display"
-        )
-
-        # MMR toggle
-        use_mmr = st.toggle(
-            "Use MMR for diversity",
-            value=True,
-            help="Maximum Marginal Relevance balances similarity with diversity"
         )
 
         st.markdown("---")
@@ -345,9 +423,8 @@ def main():
         This application uses:
         - **EmbeddingGemma** for embeddings
         - **FAISS** for vector search
-        - **MMR** for diverse results
-        - **gemma3:4b** for resume parsing
-        - **RAKE + granite4:micro** for skill extraction
+        - **gemma3:4b** for resume & job skill extraction
+        - **Semantic similarity** for skill matching
         """)
 
     # ====================
@@ -409,8 +486,8 @@ def main():
                 status_text.text("🔍 Searching for matching jobs...")
                 progress_bar.progress(75)
 
-                # Process
-                result, error = process_resume(uploaded_file, engine, top_k, use_mmr)
+                # Process with default top_k=5
+                result, error = process_resume(uploaded_file, engine, 5, use_mmr=True)
 
                 progress_bar.progress(100)
                 status_text.empty()
@@ -420,12 +497,15 @@ def main():
                     st.error(f"❌ Error: {error}")
                 else:
                     st.session_state.matching_result = result
+                    st.session_state.cached_top_k = 5  # Track cached results
+                    st.session_state.uploaded_file_name = uploaded_file.name  # Track file
 
                     # Generate report
                     report_gen = ReportGenerator()
                     st.session_state.matching_report = report_gen.generate_report(result)
 
                     st.success(f"✅ Found {len(result.matches)} matching jobs in {result.search_time_seconds:.2f}s!")
+                    st.rerun()
 
     # ====================
     # RESULTS DISPLAY
@@ -434,6 +514,31 @@ def main():
     if st.session_state.matching_result:
         result: MatchingResult = st.session_state.matching_result
         report: MatchingReport = st.session_state.matching_report
+
+        # Check if we need to fetch more results (smart caching)
+        if top_k > st.session_state.cached_top_k and uploaded_file is not None:
+            # Only re-extract if same file
+            if uploaded_file.name == st.session_state.uploaded_file_name:
+                with st.spinner(f"🔄 Fetching {top_k} matches..."):
+                    # Re-extract with higher top_k
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+                        tmp_file.write(uploaded_file.getvalue())
+                        tmp_path = Path(tmp_file.name)
+
+                    engine.use_mmr = True
+                    new_result = engine.match_resume_pdf(tmp_path, top_k=top_k)
+                    os.unlink(tmp_path)
+
+                    st.session_state.matching_result = new_result
+                    st.session_state.cached_top_k = top_k
+
+                    # Regenerate report
+                    report_gen = ReportGenerator()
+                    st.session_state.matching_report = report_gen.generate_report(new_result)
+
+                    result = new_result
+                    report = st.session_state.matching_report
+                    st.rerun()
 
         st.markdown("---")
         st.subheader("2️⃣ Results")
@@ -455,52 +560,58 @@ def main():
         with tab1:
             st.header("Match Overview")
 
+            # Use top_k for display
+            display_matches = result.matches[:top_k]
+
             # Key metrics
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("Total Matches", len(result.matches))
+                st.metric("Displaying", f"{len(display_matches)}/{len(result.matches)}")
             with col2:
-                avg_similarity = sum(m.similarity_score for m in result.matches) / len(result.matches) * 100
+                avg_similarity = sum(m.similarity_score for m in display_matches) / len(display_matches) * 100
                 st.metric("Avg Similarity", f"{avg_similarity:.1f}%")
             with col3:
-                if result.matches[0].skill_match:
-                    avg_skill = sum(m.skill_match['match_percentage'] for m in result.matches
-                                  if m.skill_match) / len(result.matches)
+                if display_matches[0].skill_match:
+                    avg_skill = sum(m.skill_match['match_percentage'] for m in display_matches
+                                  if m.skill_match) / len(display_matches)
                     st.metric("Avg Skill Match", f"{avg_skill:.1f}%")
             with col4:
                 st.metric("Search Time", f"{result.search_time_seconds:.2f}s")
 
-            # Skill analysis chart
+            # Skill analysis chart (use top_k only)
             st.markdown("### 📊 Match Quality by Job")
-            chart = create_skill_analysis_chart(report)
+            # Create a filtered report for visualization
+            filtered_report_for_chart = MatchingReport(
+                candidate_name=report.candidate_name,
+                candidate_email=report.candidate_email,
+                candidate_skills=report.candidate_skills,
+                report_date=report.report_date,
+                total_jobs_searched=report.total_jobs_searched,
+                search_time_seconds=report.search_time_seconds,
+                recommendations=report.recommendations[:top_k],
+                skill_profile_summary=report.skill_profile_summary,
+                development_recommendations=report.development_recommendations
+            )
+            chart = create_skill_analysis_chart(filtered_report_for_chart)
             st.plotly_chart(chart, use_container_width=True)
-
-            # Skill demand chart
-            demand_chart = create_skill_demand_chart(report)
-            if demand_chart:
-                st.markdown("### 🎯 Most Valuable Skills")
-                st.plotly_chart(demand_chart, use_container_width=True)
 
         # TAB 2: JOB MATCHES
         with tab2:
             st.header("Top Matching Jobs")
 
             # Filter options
-            col1, col2 = st.columns([2, 1])
-            with col1:
-                search_filter = st.text_input("🔍 Filter by job title or company", "")
-            with col2:
-                min_similarity = st.slider("Min similarity %", 0, 100, 0, 5)
+            search_filter = st.text_input("🔍 Filter by job title or company", "")
 
-            # Display filtered matches
+            # Use slider value to limit displayed jobs
+            top_k_matches = result.matches[:top_k]
             filtered_matches = [
-                m for m in result.matches
-                if (search_filter.lower() in m.job.title.lower() or
+                m for m in top_k_matches
+                if (not search_filter or
+                    search_filter.lower() in m.job.title.lower() or
                     search_filter.lower() in m.job.company.lower())
-                and (m.similarity_score * 100 >= min_similarity)
             ]
 
-            st.write(f"Showing {len(filtered_matches)} of {len(result.matches)} jobs")
+            st.write(f"Showing {len(filtered_matches)} of {top_k} jobs")
 
             for match in filtered_matches:
                 display_job_match(match, match.rank)

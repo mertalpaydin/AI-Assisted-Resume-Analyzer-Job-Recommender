@@ -55,7 +55,7 @@ Use this template for each experiment:
 
 ## Experiment Counter
 
-**Total Experiments Conducted:** 7
+**Total Experiments Conducted:** 8
 
 **By Phase:**
 - Phase 0: 0
@@ -64,7 +64,7 @@ Use this template for each experiment:
 - Phase 3: 1
 - Phase 4: 1
 - Phase 5: 2
-- Phase 6: 1
+- Phase 6: 2
 - Phase 7: 0
 - Phase 8: 0
 
@@ -113,6 +113,7 @@ Use this template for each experiment:
 | 5 | RAKE + Ollama Atomic Skill Extraction | 5 | granite4:micro | Avg Latency | 3.75s | 2025-11-21 |
 | 6 | Ranking Strategy Comparison | 5 | MMR λ=0.5 | Diversity | 10/10 unique | 2025-11-21 |
 | 7 | Skill Matching Strategy Comparison | 6.5 | Semantic (EmbeddingGemma) | Match % | 50.0% | 2025-11-25 |
+| 8 | Job Skill Extraction Method Comparison | 6.5 | gemma3:4b | Quality + Speed | 8 skills, 1.63s | 2025-11-26 |
 
 ---
 
@@ -806,5 +807,130 @@ None - skill matching remains internal to `_analyze_skills()`
 2. **Test on multiple resumes** (verify 50%+ typical match rate)
 3. **Update decision log** (Decision #7: Semantic Skill Matching)
 4. **Continue Phase 6.5 fixes** (company display, UI improvements)
+
+---
+
+### Experiment #8: Job Skill Extraction Method Comparison
+**Date:** 2025-11-26
+**Phase:** Phase 6.5 - Skill Quality Improvement
+**Objective:** Compare job skill extraction methods to improve skill match quality. Current RAKE → granite4:micro pipeline extracts noise ("recruiting", "remote work", "dress code") instead of actual technical skills.
+
+**Problem Context:**
+CV extraction uses gemma3:4b directly with excellent results. Job extraction uses RAKE → granite4:micro refinement but produces poor quality:
+- Extracts generic category names ("programming languages", "technologies") instead of actual skills
+- Includes non-skill noise ("june 5th start date", "fully remote work environment")
+- Missing actual technical requirements
+
+**Hypothesis:** Direct LLM extraction will produce better quality than RAKE → LLM refinement for job ads, though potentially slower.
+
+**Test Setup:**
+- Test job: "Data Science Intern (2023)" at 1010data (from Peter Boyd's 3rd match)
+- Job description: 2501 characters
+- 4 runs per method, discard 1st (warm-up), average remaining 3
+- Metrics: Latency, skill count, skill quality (manual review)
+
+**Options Tested:**
+
+#### 1. **gemma3:4b (LLM Only)**
+- **Configuration:** Direct LLM extraction, temperature=0.1, JSON array output
+- **Prompt:** "Extract ONLY technical skills... DO NOT include soft skills, job duties, company benefits, work arrangements"
+- **Results:**
+  - Avg Latency: **1.63s** (excluding 1st run warm-up)
+  - All Latencies: [2.07s, 1.63s, 1.60s, 1.65s]
+  - Skills Extracted: **8 skills**
+  - Skills: python, sql, machine learning, classification, regression, clustering, databases, data types
+- **Observations:**
+  - All skills are actual, specific technical skills
+  - Good mix of languages (python, sql), concepts (machine learning), and techniques (classification, regression, clustering)
+  - No noise or generic categories
+  - Reasonable latency for quality received
+
+#### 2. **granite4:micro (LLM Only)**
+- **Configuration:** Direct LLM extraction, temperature=0.1, JSON array output
+- **Prompt:** Same as gemma3:4b
+- **Results:**
+  - Avg Latency: **0.44s** (excluding 1st run warm-up)
+  - All Latencies: [4.12s, 0.43s, 0.45s, 0.44s]
+  - Skills Extracted: **3 skills**
+  - Skills: python, sql, machine learning
+- **Observations:**
+  - Valid but too few skills (only 3)
+  - Misses important concepts (classification, regression, clustering, databases)
+  - 3.7x faster than gemma3:4b
+  - First run anomaly: 4.12s (possible model loading)
+
+#### 3. **RAKE → granite4:micro (Hybrid - Current Method)**
+- **Configuration:** RAKE extracts 30 candidates → granite4:micro selects best technical skills (max 10, can be less)
+- **Prompt:** "From the following list of keyword phrases... select ONLY the ones that are actual technical skills... Return UP TO 10 of the BEST technical skills"
+- **Results:**
+  - Avg Latency: **0.76s** (excluding 1st run warm-up)
+  - All Latencies: [0.81s, 0.79s, 0.74s, 0.76s]
+  - Skills Extracted: **7 skills**
+  - Skills: programming languages, technologies and frameworks, tools and platforms, technical methodologies, data science, database skills, computer science
+  - RAKE Candidates (first 15): "1010data welcomes current college students looking", "june 5th start date", "improve data consistency within", "fully remote work environment", "one additional team member"...
+- **Observations:**
+  - **Major quality issue**: Extracted generic category names, not actual skills
+  - "programming languages" is not a skill (which languages?)
+  - "technologies and frameworks" is not a skill (which ones?)
+  - RAKE extraction includes noise: "june 5th start date", "remote work environment", "recruiting team member"
+  - LLM refinement failed to extract atomic skills from RAKE phrases
+  - Faster than gemma3:4b (2.1x) but unusable skill quality
+
+**Metrics Used:**
+- **Avg Latency (excl 1st run)**: Speed metric, excludes warm-up
+- **Skills Count**: Number of extracted skills
+- **Skill Quality**: Manual review - are they actual technical skills vs noise/categories?
+- **Consistency**: Variance across runs
+
+**Results Summary:**
+
+| Method | Avg Latency | Skills | Quality | Usability |
+|--------|-------------|--------|---------|-----------|
+| gemma3:4b | 1.63s | 8 | Excellent (specific, atomic) | ✅ **Best** |
+| granite4:micro | 0.44s | 3 | Good but incomplete | ⚠️ Too few |
+| RAKE → granite4:micro | 0.76s | 7 | Poor (generic categories) | ❌ Unusable |
+
+**Winner:** gemma3:4b
+
+**Rationale:**
+gemma3:4b selected for job skill extraction because:
+- **Best Quality**: 8 specific, atomic technical skills (python, sql, machine learning, classification, etc.)
+- **No Noise**: Zero generic categories or soft skills extracted
+- **Acceptable Speed**: 1.63s is reasonable for job matching (vs 20s+ for resume extraction)
+- **Completeness**: Captures both high-level (machine learning) and specific (regression, clustering) concepts
+- **Consistency**: All 4 runs produced 8 skills with similar quality
+
+granite4:micro too few skills (3 vs 8), misses important details.
+RAKE → granite4:micro fundamentally broken - extracts categories not skills.
+
+**Key Learning:**
+1. **Direct LLM > RAKE → LLM for job ads**: RAKE candidates from job ads are too noisy (recruitment language, benefits, dates)
+2. **Different optimal methods for CVs vs jobs**: gemma3:4b works well for both, but RAKE is only good for resumes
+3. **Quality > speed for skill extraction**: 1.63s acceptable trade-off for 2.7x better quality (8 vs 3 skills) and usable output
+4. **RAKE's failure mode**: Job descriptions have different linguistic structure than resumes - more marketing language, less structured skill lists
+5. **Model capacity matters here**: gemma3:4b (4B params) better at distinguishing actual skills from RAKE noise than granite4:micro (2B params)
+
+**Unexpected Finding:**
+RAKE → granite4:micro (current pipeline) produces generic categories ("programming languages") instead of refining RAKE output to atomic skills. This suggests the RAKE candidates are too noisy for the refinement LLM to work effectively.
+
+**Impact on Project:**
+- **Immediate**: Replace job skill extraction method from RAKE → granite4:micro to direct gemma3:4b
+- **Expected**:
+  - Skill match percentages will improve (comparing actual skills vs actual skills)
+  - Better skill gap analysis (specific missing skills instead of categories)
+  - Improved recommendation quality
+- **Code changes**: Update `SkillExtractor.extract_skills()` or create new method for job-specific extraction
+
+**Trade-offs:**
+- Speed vs Quality: Accept 1.63s (vs 0.76s) for usable skill extraction
+- Simplicity vs Accuracy: Direct LLM simpler than RAKE → LLM pipeline
+- Consistency: Same model (gemma3:4b) for both CV and job extraction
+
+**Next Steps:**
+1. Implement gemma3:4b for job skill extraction in `skill_extractor.py` or `matching_engine.py`
+2. Change default match count from 10 to 5 jobs
+3. Update minimum similarity threshold to 5th match (not 10th)
+4. Test improved skill matching quality on sample resumes
+5. Document Decision #8 in decisions.md
 
 ---

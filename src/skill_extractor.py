@@ -217,22 +217,19 @@ class SkillExtractor:
         Initialize the SkillExtractor.
 
         Args:
-            embedding_model: SentenceTransformer model for KeyBERT
+            embedding_model: SentenceTransformer model for KeyBERT (lazy-loaded only if needed)
             spacy_model: spaCy model for NER and POS tagging
             top_n: Number of top skills to extract
             keyphrase_ngram_range: N-gram range for keyphrase extraction
             diversity: Diversity parameter for MMR (0=no diversity, 1=max diversity)
             use_normalization: Whether to normalize extracted skills
         """
-        logger.info(f"Initializing SkillExtractor with model: {embedding_model}")
+        logger.info(f"Initializing SkillExtractor")
 
-        # Initialize KeyBERT
-        try:
-            self.kw_model = KeyBERT(model=embedding_model)
-            logger.info("KeyBERT model initialized successfully")
-        except Exception as e:
-            logger.error(f"Failed to initialize KeyBERT: {e}")
-            raise
+        # Store embedding model name for lazy loading
+        # KeyBERT is NOT loaded by default (only RAKE is used in production)
+        self.embedding_model = embedding_model
+        self._kw_model = None  # Lazy-loaded only when extract_skills_keybert() is called
 
         # Initialize spaCy
         try:
@@ -252,6 +249,19 @@ class SkillExtractor:
         self.normalizer = SkillNormalizer()
 
         logger.info(f"SkillExtractor initialized (top_n={top_n}, diversity={diversity})")
+
+    @property
+    def kw_model(self):
+        """Lazy-load KeyBERT model only when needed."""
+        if self._kw_model is None:
+            logger.info(f"Lazy-loading KeyBERT with model: {self.embedding_model}")
+            try:
+                self._kw_model = KeyBERT(model=self.embedding_model)
+                logger.info("KeyBERT model initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize KeyBERT: {e}")
+                raise
+        return self._kw_model
 
     def extract_skills_keybert(
         self,
@@ -487,6 +497,90 @@ JSON array:"""
             logger.error(f"Error in RAKE+LLM extraction: {e}")
             return []
 
+    def extract_job_skills_llm(
+        self,
+        job_text: str,
+        llm_model: str = "gemma3:4b"
+    ) -> List[str]:
+        """
+        Extract skills from job descriptions using gemma3:4b LLM (Decision #8).
+        Direct LLM extraction - produces high-quality atomic skills without RAKE noise.
+
+        Args:
+            job_text: Job description text
+            llm_model: Ollama model for extraction (default: gemma3:4b)
+
+        Returns:
+            List of atomic technical skills
+        """
+        import json
+        from langchain_ollama import ChatOllama
+
+        if not job_text or not isinstance(job_text, str):
+            logger.warning("Invalid input text")
+            return []
+
+        try:
+            llm = ChatOllama(model=llm_model, temperature=0.1)
+
+            prompt = f"""Extract ONLY technical skills from this job description.
+Focus on:
+- Programming languages
+- Technologies and frameworks
+- Tools and platforms
+- Technical methodologies
+- Domain-specific technical skills
+
+DO NOT include:
+- Soft skills (communication, teamwork, etc.)
+- Job duties or responsibilities
+- Company benefits
+- Work arrangements (remote, hybrid, etc.)
+
+Return ONLY a JSON array of skills, nothing else.
+
+Job Description:
+{job_text}
+
+JSON array of technical skills:"""
+
+            response = llm.invoke(prompt)
+            content = response.content.strip()
+
+            # Remove markdown code blocks if present
+            if content.startswith('```'):
+                content = content.split('```')[1]
+                if content.startswith('json'):
+                    content = content[4:]
+            content = content.strip()
+
+            # Parse JSON array
+            try:
+                skills = json.loads(content)
+                if isinstance(skills, list):
+                    # Normalize and clean
+                    skills = [s.lower().strip() for s in skills if isinstance(s, str)]
+
+                    # Apply skill normalization
+                    if self.use_normalization:
+                        skills = [self.normalizer.normalize(s) for s in skills]
+
+                    # Deduplicate
+                    skills = list(dict.fromkeys(skills))
+
+                    logger.debug(f"gemma3:4b extracted {len(skills)} job skills")
+                    return skills
+                else:
+                    logger.warning("LLM response was not a list")
+                    return []
+            except json.JSONDecodeError:
+                logger.warning("Failed to parse LLM response as JSON")
+                return []
+
+        except Exception as e:
+            logger.error(f"Error in job skill extraction with {llm_model}: {e}")
+            return []
+
     def extract_skills_rake(
         self,
         text: str,
@@ -495,7 +589,8 @@ JSON array:"""
     ) -> List[str] | List[Tuple[str, float]]:
         """
         Extract skills using RAKE (Rapid Automatic Keyword Extraction).
-        **DEFAULT METHOD** - Best F1 score (0.356), fastest (0.29s), best precision (0.400).
+        **DEFAULT METHOD for RESUME extraction** - Best F1 score (0.356), fastest (0.29s), best precision (0.400).
+        NOTE: For JOB descriptions, use extract_job_skills_llm() instead (Decision #8).
 
         Args:
             text: Input text (resume or job description)
